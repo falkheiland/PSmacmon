@@ -73,7 +73,6 @@ function Get-MacmonEndpointGroup
   {
     Invoke-MacmonTrustSelfSignedCertificate
     $BaseURL = ('https://{0}:{1}/api/v{2}/endpointgroups' -f $HostName, $TCPPort, $ApiVersion)
-    $SessionURL = ('{0}' -f $BaseURL)
     Switch ($ID)
     {
       -1
