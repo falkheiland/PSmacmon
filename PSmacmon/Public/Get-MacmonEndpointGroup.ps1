@@ -37,8 +37,11 @@ function Get-MacmonEndpointGroup
       Sort-Object obsoleteEndpointExpire, name
     #Get name and obsoleteEndpointExpire from Endpoint Group with obsoleteEndpointExpire, sorted by obsoleteEndpointExpire and name
 
-    .NOTES
-    n.a.
+    .LINK
+    https://github.com/falkheiland/PSmacmon
+
+    .LINK
+    https://<MACMONSERVER>/man/index.php?controller=ApiDocuController
 
     #>
 
