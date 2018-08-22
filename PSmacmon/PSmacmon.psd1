@@ -72,6 +72,7 @@
   FunctionsToExport = @(
     'Get-MacmonEndpoint'
     'Get-MacmonEndpointGroup'
+    'Get-MacmonNetworkDevice'
     'New-MacmonEndpoint'
     'New-MacmonEndpointGroup'
   )
