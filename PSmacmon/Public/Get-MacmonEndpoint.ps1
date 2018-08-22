@@ -19,8 +19,8 @@ function Get-MacmonEndpoint
     .PARAMETER Credential
     Credentials for the macmon NAC
 
-    .PARAMETER ID
-    ID of the endpoint group
+    .PARAMETER MACAddress
+    MAC Address of the endpoint group
 
     .EXAMPLE
     $Credential = Get-Credential -Message 'Enter your credentials'
@@ -77,16 +77,17 @@ function Get-MacmonEndpoint
     $BaseURL = ('https://{0}:{1}/api/v{2}/endpoints' -f $HostName, $TCPPort, $ApiVersion)
     Switch ($MACAddress)
     {
-      -1
+      $false
       {
         $SessionURL = ('{0}' -f $BaseURL)
+        (Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Method 'Get').SyncRoot
       }
       default
       {
         $SessionURL = ('{0}/{1}' -f $BaseURL, $MACAddress)
+        Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Method 'Get'
       }
     }
-    (Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Method 'Get').SyncRoot
   }
   end
   {
