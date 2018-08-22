@@ -1,11 +1,11 @@
-function Get-MacmonEndpointGroup
+function Get-MacmonEndpoint
 {
   <#
     .SYNOPSIS
-    Get Endpoint Group from the macmon NAC via RESTAPI.
+    Get Endpoint from the macmon NAC via RESTAPI.
 
     .DESCRIPTION
-    Get Endpoint Group from the macmon NAC via RESTAPI.
+    Get Endpoint from the macmon NAC via RESTAPI.
 
     .PARAMETER HostName
     IP-Address or Hostname of the macmon NAC
@@ -24,18 +24,16 @@ function Get-MacmonEndpointGroup
 
     .EXAMPLE
     $Credential = Get-Credential -Message 'Enter your credentials'
-    Get-MacmonEndpointGroup -Hostname 'MACMONSERVER' -Credential $Credential
-    #Ask for credential then get Endpoint Group from macmon NAC using provided credential
+    Get-MacmonEndpoint -Hostname 'MACMONSERVER' -Credential $Credential
+    #Ask for credential then get Endpoint from macmon NAC using provided credential
 
     .EXAMPLE
-    0 | Get-MacmonEndpointGroup -Hostname 'MACMONSERVER' | Select-Object -Property name, description
-    #Get name and description from Endpoint Group with ID 0
+    '00-00-FF-FF-FF-FF' | Get-MacmonEndpoint -Hostname 'MACMONSERVER'
+    #Get Endpoint with MACAddress '00-00-FF-FF-FF-FF'
 
     .EXAMPLE
-    (Get-MacmonEndpointGroup -Hostname 'MACMONSERVER').where{$_.obsoleteEndpointExpire} |
-      Select-Object -Property name, obsoleteEndpointExpire |
-      Sort-Object obsoleteEndpointExpire, name
-    #Get name and obsoleteEndpointExpire from Endpoint Group with obsoleteEndpointExpire, sorted by obsoleteEndpointExpire and name
+    (Get-MacmonEndpoint -Hostname 'MACMONSERVER').where{$_.endpointGroupId -eq 10}
+    #Get Endpoint with endpointGroupId 10
 
     .LINK
     https://github.com/falkheiland/PSmacmon
@@ -65,8 +63,9 @@ function Get-MacmonEndpointGroup
     $Credential = (Get-Credential -Message 'Enter your credentials'),
 
     [Parameter(ValueFromPipeline)]
-    [int]
-    $ID = -1
+    [ValidatePattern('(([0-9A-Fa-f]{2}[-:]){5}[0-9A-Fa-f]{2})|(([0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4})')]
+    [string]
+    $MACAddress
   )
 
   begin
@@ -75,20 +74,19 @@ function Get-MacmonEndpointGroup
   process
   {
     Invoke-MacmonTrustSelfSignedCertificate
-    $BaseURL = ('https://{0}:{1}/api/v{2}/endpointgroups' -f $HostName, $TCPPort, $ApiVersion)
-    Switch ($ID)
+    $BaseURL = ('https://{0}:{1}/api/v{2}/endpoints' -f $HostName, $TCPPort, $ApiVersion)
+    Switch ($MACAddress)
     {
       -1
       {
         $SessionURL = ('{0}' -f $BaseURL)
-        (Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Method 'Get').SyncRoot
       }
       default
       {
-        $SessionURL = ('{0}/{1}' -f $BaseURL, $ID)
-        Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Method 'Get'
+        $SessionURL = ('{0}/{1}' -f $BaseURL, $MACAddress)
       }
     }
+    (Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Method 'Get').SyncRoot
   }
   end
   {

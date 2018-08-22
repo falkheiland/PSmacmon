@@ -1,11 +1,11 @@
-function New-MacmonEndpointGroup
+function New-MacmonEndpoint
 {
   <#
     .SYNOPSIS
-    Create Endpoint Group from the macmon NAC via RESTAPI.
+    Create Endpoint from the macmon NAC via RESTAPI.
 
     .DESCRIPTION
-    Create Endpoint Group from the macmon NAC via RESTAPI. Not all properties configurable per RESTAPI are available in this function.
+    Create Endpoint from the macmon NAC via RESTAPI. Not all properties configurable per RESTAPI are available in this function.
 
     .PARAMETER HostName
     IP-Address or Hostname of the macmon NAC
@@ -63,26 +63,23 @@ function New-MacmonEndpointGroup
 
     .EXAMPLE
     $Credential = Get-Credential -Message 'Enter your credentials'
-    New-MacmonEndpointGroup -Hostname 'MACMONSERVER' -Credential $Credential -Name 'NewEndpointGroup'
-    #Ask for credential then create new endpointgroup with name 'NewEndpointGroup' (minimum requirement)
+    New-MacmonEndpoint -Hostname 'MACMONSERVER' -Credential $Credential -MACAddress '00-11-22-33-44-55'
+    #Ask for credential then create new endpoint with MAC address '00-11-22-33-44-55' (minimum requirement)
 
     .EXAMPLE
     $Properties = @{
-      Hostname               = 'MACMONSERVER'
-      name                   = 'NewEndpointGroup'
-      description            = 'new Endpoint-Group'
-      macStatisticActive     = $true
-      macValidity            = 14
-      obsoleteEndpointExpire = 180
-      authorizedVlansLow     = '10', '20', '30'
-      permissionLow          = 2
-      authorizedVlansMedium  = '20', '30'
-      permissionMedium       = 3
-      authorizedVlansHigh    = '30'
-      permissionHigh         = 1
+      Hostname        = 'MACMONSERVER'
+      mac             = '00-11-22-33-44-55'
+      comment         = 'new Enpoint-Device'
+      active          = $true
+      staticIps       = '192.168.30.1', '192.168.1.2'
+      inventory       = '012345'
+      expireTime      = '2025-01-01T00:00:00Z'
+      authorizedVlans = '10', '11'
+      endpointGroupId = 0
     }
-    New-MacmonEndpointGroup @Properties
-    #Create new endpointgroup with all supported (by function) properties
+    New-MacmonEndpoint @Properties
+    #Create new endpoint with all supported (by function) properties
 
     .OUTPUTS
     ID for the new endpointgroup
@@ -115,41 +112,34 @@ function New-MacmonEndpointGroup
     $Credential = (Get-Credential -Message 'Enter your credentials'),
 
     [Parameter(Mandatory)]
+    [Alias('Identity')]
+    [ValidatePattern('(([0-9A-Fa-f]{2}[-:]){5}[0-9A-Fa-f]{2})|(([0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4})')]
     [string]
-    $Name,
+    $MACAddress,
 
     [string]
-    $Description,
+    $Comment,
 
     [bool]
-    $MacStatisticActive = $true,
+    $Active = $true,
 
-    [int]
-    $MacValidity = 0,
+    [ValidateScript( {$_ -match [IPAddress]$_})]
+    [Alias('StaticIps')]
+    [string[]]
+    $IPAddress,
 
-    [int]
-    $ObsoleteEndpointExpire = -1,
+    [string]
+    $Inventory,
+
+    #'2018-08-23T10:05:00Z'
+    [datetime]
+    $ExpireTime,
 
     [string[]]
-    $AuthorizedVlansLow,
+    $AuthorizedVlans,
 
-    [ValidateRange(1, 3)]
     [int]
-    $PermissionLow = 3,
-
-    [string[]]
-    $AuthorizedVlansMedium,
-
-    [ValidateRange(1, 3)]
-    [int]
-    $PermissionMedium = 3,
-
-    [string[]]
-    $AuthorizedVlansHigh,
-
-    [ValidateRange(1, 3)]
-    [int]
-    $PermissionHigh = 3
+    $EndpointGroupId
   )
 
   begin
@@ -160,24 +150,24 @@ function New-MacmonEndpointGroup
     Invoke-MacmonTrustSelfSignedCertificate
 
     $Body = [ordered]@{
-      name                  = $Name
-      description           = $Description
-      macStatisticActive    = $MacStatisticActive
-      macValidity           = $MacValidity * 86400000
-      authorizedVlansLow    = $AuthorizedVlansLow
-      permissionLow         = $PermissionLow
-      authorizedVlansMedium = $AuthorizedVlansMedium
-      permissionMedium      = $PermissionMedium
-      authorizedVlansHigh   = $AuthorizedVlansHigh
-      permissionHigh        = $PermissionHigh
+      mac             = $MACAddress
+      comment         = $Comment
+      active          = $Active
+      inventory       = $Inventory
+      expireTime      = $ExpireTime
+      authorizedVlans = $AuthorizedVlans
     }
-    if ($ObsoleteEndpointExpire -ge 0)
+    if ($IPAddress)
     {
-      $Body.add('obsoleteEndpointExpire', $ObsoleteEndpointExpire * 86400000)
+      $Body.add('staticIps', $IPAddress)
+    }
+    if ($EndpointGroupId)
+    {
+      $Body.add('endpointGroupId', $EndpointGroupId)
     }
     $Body = $Body | ConvertTo-Json
 
-    $BaseURL = ('https://{0}:{1}/api/v{2}/endpointgroups' -f $HostName, $TCPPort, $ApiVersion)
+    $BaseURL = ('https://{0}:{1}/api/v{2}/endpoints' -f $HostName, $TCPPort, $ApiVersion)
     $SessionURL = ('{0}' -f $BaseURL)
     if ($PSCmdlet.ShouldProcess('EndpointGroup: {0}' -f $Name))
     {
