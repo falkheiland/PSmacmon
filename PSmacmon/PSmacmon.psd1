@@ -73,6 +73,8 @@
     'Get-MacmonEndpoint'
     'Get-MacmonEndpointGroup'
     'Get-MacmonNetworkDevice'
+    'Get-MacmonNetworkDeviceClass'
+    'Get-MacmonNetworkDeviceGroup'
     'New-MacmonEndpoint'
     'New-MacmonEndpointGroup'
   )
