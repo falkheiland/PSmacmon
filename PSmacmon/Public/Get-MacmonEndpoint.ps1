@@ -77,7 +77,7 @@ function Get-MacmonEndpoint
     $BaseURL = ('https://{0}:{1}/api/v{2}/endpoints' -f $HostName, $TCPPort, $ApiVersion)
     Switch ($MACAddress)
     {
-      $false
+      ''
       {
         $SessionURL = ('{0}' -f $BaseURL)
         (Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Method 'Get').SyncRoot
