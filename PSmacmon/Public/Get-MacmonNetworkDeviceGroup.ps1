@@ -1,11 +1,11 @@
-function Get-MacmonEndpoint
+function Get-MacmonNetworkDeviceGroup
 {
   <#
     .SYNOPSIS
-    Get Endpoint from the macmon NAC via RESTAPI.
+    Get Network Device Group from the macmon NAC via RESTAPI.
 
     .DESCRIPTION
-    Get Endpoint from the macmon NAC via RESTAPI.
+    Get Network Device Group from the macmon NAC via RESTAPI.
 
     .PARAMETER HostName
     IP-Address or Hostname of the macmon NAC
@@ -19,21 +19,21 @@ function Get-MacmonEndpoint
     .PARAMETER Credential
     Credentials for the macmon NAC
 
-    .PARAMETER MACAddress
-    MAC Address of the endpoint group
+    .PARAMETER ID
+    ID of the network device group
 
     .EXAMPLE
     $Credential = Get-Credential -Message 'Enter your credentials'
-    Get-MacmonEndpoint -Hostname 'MACMONSERVER' -Credential $Credential
-    #Ask for credential then get Endpoint from macmon NAC using provided credential
+    Get-MacmonNetworkDeviceGroup -Hostname 'MACMONSERVER' -Credential $Credential
+    #Ask for credential then get Network Device Groups from macmon NAC using provided credential
 
     .EXAMPLE
-    '00-00-FF-FF-FF-FF' | Get-MacmonEndpoint -Hostname 'MACMONSERVER'
-    #Get Endpoint with MACAddress '00-00-FF-FF-FF-FF'
+    585 | Get-MacmonNetworkDeviceGroup -Hostname 'MACMONSERVER'
+    #Get Network Device Group with ID 585
 
     .EXAMPLE
-    (Get-MacmonEndpoint -Hostname 'MACMONSERVER').where{$_.endpointGroupId -eq 10}
-    #Get Endpoint with endpointGroupId 10
+    (Get-MacmonNetworkDeviceGroup -Hostname 'MACMONSERVER').where{$_.description -match '^Template.*'}
+    #Get Network Device Groups with description starting with 'Template'
 
     .LINK
     https://github.com/falkheiland/PSmacmon
@@ -63,9 +63,8 @@ function Get-MacmonEndpoint
     $Credential = (Get-Credential -Message 'Enter your credentials'),
 
     [Parameter(ValueFromPipeline)]
-    [ValidatePattern('(([0-9A-Fa-f]{2}[-:]){5}[0-9A-Fa-f]{2})|(([0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4})')]
-    [string]
-    $MACAddress
+    [int]
+    $ID = -1
   )
 
   begin
@@ -74,17 +73,17 @@ function Get-MacmonEndpoint
   process
   {
     Invoke-MacmonTrustSelfSignedCertificate
-    $BaseURL = ('https://{0}:{1}/api/v{2}/endpoints' -f $HostName, $TCPPort, $ApiVersion)
-    Switch ($MACAddress)
+    $BaseURL = ('https://{0}:{1}/api/v{2}/networkdeviceclasses' -f $HostName, $TCPPort, $ApiVersion)
+    Switch ($ID)
     {
-      ''
+      -1
       {
         $SessionURL = ('{0}' -f $BaseURL)
         (Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Method 'Get').SyncRoot
       }
       default
       {
-        $SessionURL = ('{0}/{1}' -f $BaseURL, $MACAddress)
+        $SessionURL = ('{0}/{1}' -f $BaseURL, $ID)
         Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Method 'Get'
       }
     }

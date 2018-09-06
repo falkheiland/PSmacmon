@@ -72,8 +72,12 @@
   FunctionsToExport = @(
     'Get-MacmonEndpoint'
     'Get-MacmonEndpointGroup'
+    'Get-MacmonNetworkDevice'
+    'Get-MacmonNetworkDeviceClass'
+    'Get-MacmonNetworkDeviceGroup'
     'New-MacmonEndpoint'
     'New-MacmonEndpointGroup'
+    'New-MacmonNetworkDevice'
   )
 
   # Aus diesem Modul zu exportierende Cmdlets. Um optimale Leistung zu erzielen, verwenden Sie keine Platzhalter und löschen den Eintrag nicht. Verwenden Sie ein leeres Array, wenn keine zu exportierenden Cmdlets vorhanden sind.

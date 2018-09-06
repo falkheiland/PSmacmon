@@ -31,7 +31,7 @@ function New-MacmonEndpointGroup
     .PARAMETER MacValidity
     Validity duration of the MAC addresses in the group in days. (Default 0 =  no specification)
 
-    .PARAMETER
+    .PARAMETER ObsoleteEndpointExpire
     Number of days until no longer discovered and not manually changed MAC addresses are deenabled or deleted in the group.
     A value of 0 disables the check of the obsolete_endpoint_expire for the group.
     In this case, the setting configured under Settings --> Scan engine is no longer taken into consideration for the group.
