@@ -2,10 +2,10 @@ function Get-MacmonNetworkDevice
 {
   <#
     .SYNOPSIS
-    Get Network Devices from the macmon NAC via RESTAPI.
+    Get network device from the macmon NAC via RESTAPI.
 
     .DESCRIPTION
-    Get Network Devices from the macmon NAC via RESTAPI.
+    Get network device from the macmon NAC via RESTAPI.
 
     .PARAMETER HostName
     IP-Address or Hostname of the macmon NAC
@@ -25,15 +25,15 @@ function Get-MacmonNetworkDevice
     .EXAMPLE
     $Credential = Get-Credential -Message 'Enter your credentials'
     Get-MacmonNetworkDevice -Hostname 'MACMONSERVER' -Credential $Credential
-    #Ask for credential then get Network Devices from macmon NAC using provided credential
+    #Ask for credential then get network device from macmon NAC using provided credential
 
     .EXAMPLE
-    1 | Get-MacmonNetworkDevice -Hostname 'MACMONSERVER'
-    #Get Network Devices with ID 1
+    60 | Get-MacmonNetworkDevice -Hostname 'MACMONSERVER'
+    #Get network device with ID 60
 
     .EXAMPLE
-    (Get-MacmonNetworkDevice -Hostname 'MACMONSERVER').where{$_.networkDeviceClassId -eq 63}
-    #Get Network Devices with networkDeviceClassId 63
+    ((Get-MacmonNetworkDevice -Hostname 'MACMONSERVER').where{$_.networkDeviceGroupId -eq 14}).description
+    #Get description of all network devices with networkDeviceGroupId 14
 
     .LINK
     https://github.com/falkheiland/PSmacmon
