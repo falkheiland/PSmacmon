@@ -159,7 +159,7 @@ function New-MacmonEndpointGroup
   {
     Invoke-MacmonTrustSelfSignedCertificate
 
-    $Body = [ordered]@{
+    $Body = @{
       name                  = $Name
       description           = $Description
       macStatisticActive    = $MacStatisticActive
