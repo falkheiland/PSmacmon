@@ -29,6 +29,10 @@ function Invoke-MacmonRestMethod
     [string]
     $Body,
 
+    [Parameter(ParameterSetName = 'BodyBrackets')]
+    [string]
+    $BodyBrackets,
+
     [Parameter(Mandatory)]
     [ValidateSet('Get', 'Post', 'Delete', 'Patch', 'Put')]
     [string]
@@ -51,6 +55,16 @@ function Invoke-MacmonRestMethod
           Uri         = $SessionURL
           Headers     = @{Authorization = ("Basic {0}" -f $base64AuthInfo)}
           Body        = '{0}' -f $Body
+          ContentType = 'application/json'
+          Method      = $Method
+        }
+      }
+      BodyBrackets
+      {
+        $Params = @{
+          Uri         = $SessionURL
+          Headers     = @{Authorization = ("Basic {0}" -f $base64AuthInfo)}
+          Body        = '[{0}]' -f $BodyBrackets
           ContentType = 'application/json'
           Method      = $Method
         }
