@@ -71,7 +71,7 @@ function New-MacmonEndpointGroup
       Hostname               = 'MACMONSERVER'
       name                   = 'NewEndpointGroup'
       description            = 'new Endpoint-Group'
-      macStatisticActive     = $true
+      macStatisticActive     = 'false'
       macValidity            = 14
       obsoleteEndpointExpire = 180
       authorizedVlansLow     = '10', '20', '30'
@@ -121,8 +121,8 @@ function New-MacmonEndpointGroup
     [string]
     $Description,
 
-    [bool]
-    $MacStatisticActive = $true,
+    [string]
+    $MacStatisticActive = 'true',
 
     [int]
     $MacValidity = 0,
