@@ -2,10 +2,10 @@ function Update-MacmonEndpointGroupProperty
 {
   <#
     .SYNOPSIS
-    Add Endpoint Group Property from the macmon NAC via RESTAPI.
+    Update Endpoint Group Property from the macmon NAC via RESTAPI.
 
     .DESCRIPTION
-    Add Endpoint Group Property from the macmon NAC via RESTAPI. Not all properties configurable per RESTAPI are available in this function.
+    Update Endpoint Group Property from the macmon NAC via RESTAPI. Not all properties configurable per RESTAPI are available in this function.
 
     .PARAMETER HostName
     IP-Address or Hostname of the macmon NAC
@@ -19,13 +19,16 @@ function Update-MacmonEndpointGroupProperty
     .PARAMETER Credential
     Credentials for the macmon NAC
 
+    .PARAMETER ID
+    ID of the group
+
     .PARAMETER Name
-    Unique name of the group
+    Name of the group
 
     .PARAMETER Description
     Description of the group
 
-    .PARAMETER MacStatisticActive
+    .PARAMETER macStatisticActive
     Enables the gathering of online statistics for this group. (Default $true)
 
     .PARAMETER MacValidity
@@ -63,15 +66,15 @@ function Update-MacmonEndpointGroupProperty
 
     .EXAMPLE
     $Credential = Get-Credential -Message 'Enter your credentials'
-    Update-MacmonEndpointGroupProperty -Hostname 'MACMONSERVER' -Credential $Credential -ID 187 -Name 'N1426' -Description 'D1426' -ObsoleteEndpointExpire 180
-    Update-MacmonEndpointGroupProperty -Hostname 'MACMONSERVER' -Credential $Credential -ID 187 -ObsoleteEndpointExpire 90
-    #Ask for credential then Update new endpointgroup with name 'NewEndpointGroup' (minimum requirement)
+    Update-MacmonEndpointGroupProperty -Hostname 'MACMONSERVER' -Credential $Credential -ID 187 -Name 'New Name'
+    #Ask for credential then update endpointgroup with ID 187 (minimum requirement)
 
     .EXAMPLE
     $Properties = @{
       Hostname               = 'MACMONSERVER'
-      name                   = 'NewEndpointGroup'
-      description            = 'new Endpoint-Group'
+      ID                     = 188
+      name                   = 'New Name'
+      description            = 'New Description'
       macStatisticActive     = $true
       macValidity            = 14
       obsoleteEndpointExpire = 180
@@ -83,10 +86,10 @@ function Update-MacmonEndpointGroupProperty
       permissionHigh         = 1
     }
     Update-MacmonEndpointGroupProperty @Properties
-    #Add endpointgroup properties
+    #update endpointgroup with ID 187 (all provided properties)
 
     .OUTPUTS
-    ID for the new endpointgroup
+    none
 
     .LINK
     https://github.com/falkheiland/PSmacmon
@@ -96,7 +99,7 @@ function Update-MacmonEndpointGroupProperty
 
     #>
 
-  [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Medium')]
+  [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High')]
   param (
     [Parameter(Mandatory)]
     [string]
@@ -125,7 +128,9 @@ function Update-MacmonEndpointGroupProperty
     [string]
     $Description,
 
-    [bool]
+    #[bool]
+    #$MacStatisticActive,
+    [string]
     $MacStatisticActive,
 
     [int]
@@ -191,7 +196,7 @@ function Update-MacmonEndpointGroupProperty
       $BodyMacValidity = [ordered]@{
         op    = 'replace'
         path  = '/macValidity'
-        value = $BodyMacValidity * 86400000
+        value = $MacValidity * 86400
       } | ConvertTo-Json
     }
     if ($ObsoleteEndpointExpire)
@@ -202,9 +207,57 @@ function Update-MacmonEndpointGroupProperty
         value = $ObsoleteEndpointExpire * 86400
       } | ConvertTo-Json
     }
+    if ($AuthorizedVlansLow)
+    {
+      $BodyAuthorizedVlansLow = [ordered]@{
+        op    = 'replace'
+        path  = '/authorizedVlansLow'
+        value = $AuthorizedVlansLow
+      } | ConvertTo-Json
+    }
+    if ($PermissionLow)
+    {
+      $BodyPermissionLow = [ordered]@{
+        op    = 'replace'
+        path  = '/permissionLow'
+        value = $PermissionLow
+      } | ConvertTo-Json
+    }
+    if ($AuthorizedVlansMedium)
+    {
+      $BodyAuthorizedVlansMedium = [ordered]@{
+        op    = 'replace'
+        path  = '/authorizedVlansMedium'
+        value = $AuthorizedVlansMedium
+      } | ConvertTo-Json
+    }
+    if ($PermissionMedium)
+    {
+      $BodyPermissionMedium = [ordered]@{
+        op    = 'replace'
+        path  = '/permissionMedium'
+        value = $PermissionMedium
+      } | ConvertTo-Json
+    }
+    if ($AuthorizedVlansHigh)
+    {
+      $BodyAuthorizedVlansHigh = [ordered]@{
+        op    = 'replace'
+        path  = '/authorizedVlansHigh'
+        value = $AuthorizedVlansHigh
+      } | ConvertTo-Json
+    }
+    if ($PermissionHigh)
+    {
+      $BodyPermissionHigh = [ordered]@{
+        op    = 'replace'
+        path  = '/permissionHigh'
+        value = $PermissionHigh
+      } | ConvertTo-Json
+    }
     foreach ($item in ($BodyName, $BodyDescription, $BodyMacStatisticActive, $BodyMacValidity,
-    $BodyObsoleteEndpointExpire, $BodyAuthorizedVlansLow, $BodyPermissionLow, $BodyAuthorizedVlansMedium,
-    $BodyPermissionMedium, $BodyAuthorizedVlansHigh, $BodyPermissionHigh))
+        $BodyObsoleteEndpointExpire, $BodyAuthorizedVlansLow, $BodyPermissionLow, $BodyAuthorizedVlansMedium,
+        $BodyPermissionMedium, $BodyAuthorizedVlansHigh, $BodyPermissionHigh))
     {
       if ($item)
       {
@@ -212,12 +265,14 @@ function Update-MacmonEndpointGroupProperty
       }
     }
     $Body = $Body.TrimEnd() -replace ',$'
-    $Body
-    $BaseURL = ('https://{0}:{1}/api/v{2}/endpointgroups' -f $HostName, $TCPPort, $ApiVersion)
-    $SessionURL = ('{0}/{1}' -f $BaseURL, $ID)
-    if ($PSCmdlet.ShouldProcess('EndpointGroup: {0}' -f $ID))
+    if ($Body)
     {
-      Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -BodyBrackets $Body -Method 'Patch'
+      $BaseURL = ('https://{0}:{1}/api/v{2}/endpointgroups' -f $HostName, $TCPPort, $ApiVersion)
+      $SessionURL = ('{0}/{1}' -f $BaseURL, $ID)
+      if ($PSCmdlet.ShouldProcess('EndpointGroup: {0}' -f $ID))
+      {
+        Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -BodyBrackets $Body -Method 'Patch'
+      }
     }
   }
   end
