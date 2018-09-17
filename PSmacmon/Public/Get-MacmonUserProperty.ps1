@@ -1,11 +1,11 @@
-function Get-MacmonNetworkDeviceGroup
+function Get-MacmonUserProperty
 {
   <#
     .SYNOPSIS
-    Get Network Device Group from the macmon NAC via RESTAPI.
+    Get User property from the macmon NAC via RESTAPI.
 
     .DESCRIPTION
-    Get Network Device Group from the macmon NAC via RESTAPI.
+    Get User property from the macmon NAC via RESTAPI.
 
     .PARAMETER HostName
     IP-Address or Hostname of the macmon NAC
@@ -20,20 +20,16 @@ function Get-MacmonNetworkDeviceGroup
     Credentials for the macmon NAC
 
     .PARAMETER ID
-    ID of the network device group
+    ID of the User property
 
     .EXAMPLE
     $Credential = Get-Credential -Message 'Enter your credentials'
-    Get-MacmonNetworkDeviceGroup -Hostname 'MACMONSERVER' -Credential $Credential
-    #Ask for credential then get Network Device Groups from macmon NAC using provided credential
+    Get-MacmonUserProperty -Hostname 'MACMONSERVER' -Credential $Credential
+    #Ask for credential then get User propertys from macmon NAC using provided credential
 
     .EXAMPLE
-    20 | Get-MacmonNetworkDeviceGroup -Hostname 'MACMONSERVER'
-    #Get Network Device Group with ID 20
-
-    .EXAMPLE
-    (Get-MacmonNetworkDeviceGroup -Hostname 'MACMONSERVER').where{$_.name -match 'SonicWALL.*'}
-    #Get Network Device Groups with name containing with 'SonicWALL'
+    10 | Get-MacmonUserProperty -Hostname 'MACMONSERVER'
+    #Get User property with ID 10
 
     .LINK
     https://github.com/falkheiland/PSmacmon
@@ -73,7 +69,7 @@ function Get-MacmonNetworkDeviceGroup
   process
   {
     Invoke-MacmonTrustSelfSignedCertificate
-    $BaseURL = ('https://{0}:{1}/api/v{2}/networkdevicegroups' -f $HostName, $TCPPort, $ApiVersion)
+    $BaseURL = ('https://{0}:{1}/api/v{2}/userproperties' -f $HostName, $TCPPort, $ApiVersion)
     Switch ($ID)
     {
       -1

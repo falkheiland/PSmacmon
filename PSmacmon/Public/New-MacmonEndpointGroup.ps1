@@ -45,21 +45,21 @@ function New-MacmonEndpointGroup
     .PARAMETER PermissionLow
     Permission for authentication only based on MAC address
     (e.g. MAC address detected when scanning the switch interface or MAB - MAC Authentication Bypass) (MAC address only)
-    (1 Accept only (without VLAN); 2 Accept with VLAN; 3  Accept and VLAN (Default))
+    (-1 Deny; 1 Accept only (without VLAN); 2 Accept with VLAN; 3 Accept and VLAN (Default))
 
     .PARAMETER AuthorizedVlansMedium
     Authorized VLANs for authentication with identity and password via 802.1X
 
     .PARAMETER PermissionMedium
     Permission for authentication with identity and password via 802.1X
-    (1 Accept only (without VLAN); 2 Accept with VLAN; 3  Accept and VLAN (Default))
+    (-1 Deny; 1 Accept only (without VLAN); 2 Accept with VLAN; 3 Accept and VLAN (Default))
 
     .PARAMETER AuthorizedVlansHigh
     Authorized VLANs for authentication with certificate via 802.1X
 
     .PARAMETER PermissionHigh
     Permission for authentication with certificate via 802.1X
-    (1 Accept only (without VLAN); 2 Accept with VLAN; 3  Accept and VLAN (Default))
+    (-1 Deny; 1 Accept only (without VLAN); 2 Accept with VLAN; 3 Accept and VLAN (Default))
 
     .EXAMPLE
     $Credential = Get-Credential -Message 'Enter your credentials'
@@ -71,7 +71,7 @@ function New-MacmonEndpointGroup
       Hostname               = 'MACMONSERVER'
       name                   = 'NewEndpointGroup'
       description            = 'new Endpoint-Group'
-      macStatisticActive     = $true
+      macStatisticActive     = 'false'
       macValidity            = 14
       obsoleteEndpointExpire = 180
       authorizedVlansLow     = '10', '20', '30'
@@ -121,8 +121,8 @@ function New-MacmonEndpointGroup
     [string]
     $Description,
 
-    [bool]
-    $MacStatisticActive = $true,
+    [string]
+    $MacStatisticActive = 'true',
 
     [int]
     $MacValidity = 0,
@@ -133,21 +133,21 @@ function New-MacmonEndpointGroup
     [string[]]
     $AuthorizedVlansLow,
 
-    [ValidateRange(1, 3)]
+    [ValidateSet(-1, 1, 2, 3)]
     [int]
     $PermissionLow = 3,
 
     [string[]]
     $AuthorizedVlansMedium,
 
-    [ValidateRange(1, 3)]
+    [ValidateSet(-1, 1, 2, 3)]
     [int]
     $PermissionMedium = 3,
 
     [string[]]
     $AuthorizedVlansHigh,
 
-    [ValidateRange(1, 3)]
+    [ValidateSet(-1, 1, 2, 3)]
     [int]
     $PermissionHigh = 3
   )
@@ -159,7 +159,7 @@ function New-MacmonEndpointGroup
   {
     Invoke-MacmonTrustSelfSignedCertificate
 
-    $Body = [ordered]@{
+    $Body = @{
       name                  = $Name
       description           = $Description
       macStatisticActive    = $MacStatisticActive

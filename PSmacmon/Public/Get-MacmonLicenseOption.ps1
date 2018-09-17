@@ -1,11 +1,11 @@
-function Get-MacmonNetworkDeviceGroup
+function Get-MacmonLicenseOption
 {
   <#
     .SYNOPSIS
-    Get Network Device Group from the macmon NAC via RESTAPI.
+    Get License Option from the macmon NAC via RESTAPI.
 
     .DESCRIPTION
-    Get Network Device Group from the macmon NAC via RESTAPI.
+    Get License Option from the macmon NAC via RESTAPI.
 
     .PARAMETER HostName
     IP-Address or Hostname of the macmon NAC
@@ -19,21 +19,17 @@ function Get-MacmonNetworkDeviceGroup
     .PARAMETER Credential
     Credentials for the macmon NAC
 
-    .PARAMETER ID
-    ID of the network device group
+    .PARAMETER Name
+    Name of the License Option
 
     .EXAMPLE
     $Credential = Get-Credential -Message 'Enter your credentials'
-    Get-MacmonNetworkDeviceGroup -Hostname 'MACMONSERVER' -Credential $Credential
-    #Ask for credential then get Network Device Groups from macmon NAC using provided credential
+    Get-MacmonLicenseOption -Hostname 'MACMONSERVER' -Credential $Credential
+    #Ask for credential then get license options from macmon NAC using provided credential
 
     .EXAMPLE
-    20 | Get-MacmonNetworkDeviceGroup -Hostname 'MACMONSERVER'
-    #Get Network Device Group with ID 20
-
-    .EXAMPLE
-    (Get-MacmonNetworkDeviceGroup -Hostname 'MACMONSERVER').where{$_.name -match 'SonicWALL.*'}
-    #Get Network Device Groups with name containing with 'SonicWALL'
+    'TOPOLOGY' | Get-MacmonLicenseOption -Hostname 'MACMONSERVER' | Select-Object -Property name, description
+    #Get name and description from license option with Name 'TOPOLOGY'
 
     .LINK
     https://github.com/falkheiland/PSmacmon
@@ -63,8 +59,8 @@ function Get-MacmonNetworkDeviceGroup
     $Credential = (Get-Credential -Message 'Enter your credentials'),
 
     [Parameter(ValueFromPipeline)]
-    [int]
-    $ID = -1
+    [string]
+    $Name
   )
 
   begin
@@ -73,17 +69,17 @@ function Get-MacmonNetworkDeviceGroup
   process
   {
     Invoke-MacmonTrustSelfSignedCertificate
-    $BaseURL = ('https://{0}:{1}/api/v{2}/networkdevicegroups' -f $HostName, $TCPPort, $ApiVersion)
-    Switch ($ID)
+    $BaseURL = ('https://{0}:{1}/api/v{2}/licenseoptions' -f $HostName, $TCPPort, $ApiVersion)
+    Switch ($Name)
     {
-      -1
+      ''
       {
         $SessionURL = ('{0}' -f $BaseURL)
         (Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Method 'Get').SyncRoot
       }
       default
       {
-        $SessionURL = ('{0}/{1}' -f $BaseURL, $ID)
+        $SessionURL = ('{0}/{1}' -f $BaseURL, $Name)
         Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Method 'Get'
       }
     }
