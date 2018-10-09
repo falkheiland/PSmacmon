@@ -79,7 +79,8 @@ function Get-MacmonNetworkSegment
       }
       default
       {
-        $SessionURL = ('{0}/{1}' -f $BaseURL, $Id)
+        $SessionURL = ('{0}/{1}' -f $BaseURL, ($Id -replace '/', '%2F'))
+        $SessionURL
         Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Method 'Get'
       }
     }
