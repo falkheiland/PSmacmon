@@ -72,21 +72,18 @@ function Update-MacmonEndpointProperty
     .EXAMPLE
     $Properties = @{
       Hostname               = 'MACMONSERVER'
-      ID                     = 188
-      name                   = 'New Name'
-      description            = 'New Description'
-      macStatisticActive     = $true
-      Inventory            = 14
-      obsoleteEndpointExpire = 180
-      AuthorizedVlans     = '10', '20', '30'
-      EndpointGroupId          = 2
-      authorizedVlansMedium  = '20', '30'
-      permissionMedium       = 3
-      authorizedVlansHigh    = '30'
-      permissionHigh         = 1
+      MACAddress             = '8C-73-6E-0B-33-6E'
+      Comment                = 'New Comment'
+      Active                 = 'False'
+      StaticIps              = '192.168.1.1', '10.10.10.11'
+      Inventory              = '012345'
+      ExpireTime             = '2022-08-23T10:05:00Z'
+      #AuthorizedVlans        = '10', '20', '30'
+      AuthorizedVlans        = 'vlanA'
+      EndpointGroupId        = 11
     }
     Update-MacmonEndpointProperty @Properties
-    #update endpointgroup with ID 187 (all provided properties)
+    #update endpoint with MACAddress '8C-73-6E-0B-33-6E' (all provided properties)
 
     .OUTPUTS
     none
@@ -126,7 +123,8 @@ function Update-MacmonEndpointProperty
     [string]
     $Comment,
 
-    [bool]
+    [string]
+    [ValidateSet('True', 'False')]
     $Active,
 
     [string[]]
@@ -135,6 +133,10 @@ function Update-MacmonEndpointProperty
 
     [string]
     $Inventory,
+
+    #'2018-08-23T10:05:00Z'
+    [datetime]
+    $ExpireTime,
 
     [string[]]
     $AuthorizedVlans,
@@ -181,6 +183,14 @@ function Update-MacmonEndpointProperty
         value = $Inventory
       } | ConvertTo-Json
     }
+    if ($ExpireTime)
+    {
+      $BodyExpireTime = [ordered]@{
+        op    = 'replace'
+        path  = '/expireTime'
+        value = $ExpireTime
+      } | ConvertTo-Json
+    }
     if ($AuthorizedVlans)
     {
       $BodyAuthorizedVlans = [ordered]@{
@@ -198,7 +208,7 @@ function Update-MacmonEndpointProperty
       } | ConvertTo-Json
     }
     foreach ($item in ($BodyComment, $BodyActive, $BodyStaticIps, $BodyInventory,
-        $BodyObsoleteEndpointExpire, $BodyAuthorizedVlans, $BodyEndpointGroupId))
+        $BodyExpireTime, $BodyAuthorizedVlans, $BodyEndpointGroupId))
     {
       if ($item)
       {
