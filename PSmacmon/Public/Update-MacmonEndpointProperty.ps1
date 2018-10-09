@@ -1,11 +1,11 @@
-function Update-MacmonEndpointGroupProperty
+function Update-MacmonEndpointProperty
 {
   <#
     .SYNOPSIS
-    Update Endpoint Group Property from the macmon NAC via RESTAPI.
+    Update Endpoint Property from the macmon NAC via RESTAPI.
 
     .DESCRIPTION
-    Update Endpoint Group Property from the macmon NAC via RESTAPI. Not all properties configurable per RESTAPI are available in this function.
+    Update Endpoint Property from the macmon NAC via RESTAPI. Not all properties configurable per RESTAPI are available in this function.
 
     .PARAMETER HostName
     IP-Address or Hostname of the macmon NAC
@@ -31,7 +31,7 @@ function Update-MacmonEndpointGroupProperty
     .PARAMETER macStatisticActive
     Enables the gathering of online statistics for this group. (Default $true)
 
-    .PARAMETER MacValidity
+    .PARAMETER Inventory
     Validity duration of the MAC addresses in the group in days. (Default 0 =  no specification)
 
     .PARAMETER ObsoleteEndpointExpire
@@ -41,11 +41,11 @@ function Update-MacmonEndpointGroupProperty
     If an value of -1 is specified in the group, then the obsolete_mac_expire configured in the settings is used.
     (0 = deactivated, default -1 = use global setting)
 
-    .PARAMETER AuthorizedVlansLow
+    .PARAMETER AuthorizedVlans
     Authorized VLANs for authentication only based on MAC address
     (e.g. MAC address detected when scanning the switch interface or MAB - MAC Authentication Bypass) (MAC address only)
 
-    .PARAMETER PermissionLow
+    .PARAMETER EndpointGroupId
     Permission for authentication only based on MAC address
     (e.g. MAC address detected when scanning the switch interface or MAB - MAC Authentication Bypass) (MAC address only)
     (-1 Deny; 1 Accept only (without VLAN); 2 Accept with VLAN; 3 Accept and VLAN (Default))
@@ -66,8 +66,8 @@ function Update-MacmonEndpointGroupProperty
 
     .EXAMPLE
     $Credential = Get-Credential -Message 'Enter your credentials'
-    Update-MacmonEndpointGroupProperty -Hostname 'MACMONSERVER' -Credential $Credential -ID 187 -Name 'New Name'
-    #Ask for credential then update name of endpointgroup with ID 187
+    Update-MacmonEndpointProperty -Hostname 'MACMONSERVER' -Credential $Credential -MACAddress '8C-73-6E-0B-33-6E' -Comment 'New Comment'
+    #Ask for credential then update comment of endpoint with MACAddress '8C-73-6E-0B-33-6E'
 
     .EXAMPLE
     $Properties = @{
@@ -76,16 +76,16 @@ function Update-MacmonEndpointGroupProperty
       name                   = 'New Name'
       description            = 'New Description'
       macStatisticActive     = $true
-      macValidity            = 14
+      Inventory            = 14
       obsoleteEndpointExpire = 180
-      authorizedVlansLow     = '10', '20', '30'
-      permissionLow          = 2
+      AuthorizedVlans     = '10', '20', '30'
+      EndpointGroupId          = 2
       authorizedVlansMedium  = '20', '30'
       permissionMedium       = 3
       authorizedVlansHigh    = '30'
       permissionHigh         = 1
     }
-    Update-MacmonEndpointGroupProperty @Properties
+    Update-MacmonEndpointProperty @Properties
     #update endpointgroup with ID 187 (all provided properties)
 
     .OUTPUTS
@@ -119,44 +119,28 @@ function Update-MacmonEndpointGroupProperty
     $Credential = (Get-Credential -Message 'Enter your credentials'),
 
     [Parameter(Mandatory)]
-    [int]
-    $ID,
+    [ValidatePattern('(([0-9A-Fa-f]{2}[-:]){5}[0-9A-Fa-f]{2})|(([0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4})')]
+    [string]
+    $MACAddress,
 
     [string]
-    $Name,
+    $Comment,
+
+    [bool]
+    $Active,
+
+    [string[]]
+    [ValidateScript( {$_ -match [IPAddress]$_ })]
+    $StaticIps,
 
     [string]
-    $Description,
-
-    [string]
-    $MacStatisticActive,
-
-    [int]
-    $MacValidity,
-
-    [int]
-    $ObsoleteEndpointExpire,
+    $Inventory,
 
     [string[]]
-    $AuthorizedVlansLow,
+    $AuthorizedVlans,
 
-    [ValidateSet(-1, 1, 2, 3)]
     [int]
-    $PermissionLow,
-
-    [string[]]
-    $AuthorizedVlansMedium,
-
-    [ValidateSet(-1, 1, 2, 3)]
-    [int]
-    $PermissionMedium,
-
-    [string[]]
-    $AuthorizedVlansHigh,
-
-    [ValidateSet(-1, 1, 2, 3)]
-    [int]
-    $PermissionHigh
+    $EndpointGroupId
   )
 
   begin
@@ -165,97 +149,56 @@ function Update-MacmonEndpointGroupProperty
   process
   {
     Invoke-MacmonTrustSelfSignedCertificate
-    if ($Name)
+    if ($Comment)
     {
-      $BodyName = [ordered]@{
+      $BodyComment = [ordered]@{
         op    = 'replace'
-        path  = '/name'
-        value = $Name
+        path  = '/comment'
+        value = $Comment
       } | ConvertTo-Json
     }
-    if ($Description)
+    if ($Active)
     {
-      $BodyDescription = [ordered]@{
+      $BodyActive = [ordered]@{
         op    = 'replace'
-        path  = '/description'
-        value = $Description
+        path  = '/active'
+        value = $Active
       } | ConvertTo-Json
     }
-    if ($MacStatisticActive)
+    if ($StaticIps)
     {
-      $BodyMacStatisticActive = [ordered]@{
+      $BodyStaticIps = [ordered]@{
         op    = 'replace'
-        path  = '/macStatisticActive'
-        value = $MacStatisticActive
+        path  = '/staticIps'
+        value = $StaticIps
       } | ConvertTo-Json
     }
-    if ($MacValidity)
+    if ($Inventory)
     {
-      $BodyMacValidity = [ordered]@{
+      $BodyInventory = [ordered]@{
         op    = 'replace'
-        path  = '/macValidity'
-        value = $MacValidity * 86400
+        path  = '/inventory'
+        value = $Inventory
       } | ConvertTo-Json
     }
-    if ($ObsoleteEndpointExpire)
+    if ($AuthorizedVlans)
     {
-      $BodyObsoleteEndpointExpire = [ordered]@{
+      $BodyAuthorizedVlans = [ordered]@{
         op    = 'replace'
-        path  = '/obsoleteEndpointExpire'
-        value = $ObsoleteEndpointExpire * 86400
+        path  = '/authorizedVlans'
+        value = $AuthorizedVlans
       } | ConvertTo-Json
     }
-    if ($AuthorizedVlansLow)
+    if ($EndpointGroupId)
     {
-      $BodyAuthorizedVlansLow = [ordered]@{
+      $BodyEndpointGroupId = [ordered]@{
         op    = 'replace'
-        path  = '/authorizedVlansLow'
-        value = $AuthorizedVlansLow
+        path  = '/endpointGroupId'
+        value = $EndpointGroupId
       } | ConvertTo-Json
     }
-    if ($PermissionLow)
-    {
-      $BodyPermissionLow = [ordered]@{
-        op    = 'replace'
-        path  = '/permissionLow'
-        value = $PermissionLow
-      } | ConvertTo-Json
-    }
-    if ($AuthorizedVlansMedium)
-    {
-      $BodyAuthorizedVlansMedium = [ordered]@{
-        op    = 'replace'
-        path  = '/authorizedVlansMedium'
-        value = $AuthorizedVlansMedium
-      } | ConvertTo-Json
-    }
-    if ($PermissionMedium)
-    {
-      $BodyPermissionMedium = [ordered]@{
-        op    = 'replace'
-        path  = '/permissionMedium'
-        value = $PermissionMedium
-      } | ConvertTo-Json
-    }
-    if ($AuthorizedVlansHigh)
-    {
-      $BodyAuthorizedVlansHigh = [ordered]@{
-        op    = 'replace'
-        path  = '/authorizedVlansHigh'
-        value = $AuthorizedVlansHigh
-      } | ConvertTo-Json
-    }
-    if ($PermissionHigh)
-    {
-      $BodyPermissionHigh = [ordered]@{
-        op    = 'replace'
-        path  = '/permissionHigh'
-        value = $PermissionHigh
-      } | ConvertTo-Json
-    }
-    foreach ($item in ($BodyName, $BodyDescription, $BodyMacStatisticActive, $BodyMacValidity,
-        $BodyObsoleteEndpointExpire, $BodyAuthorizedVlansLow, $BodyPermissionLow, $BodyAuthorizedVlansMedium,
-        $BodyPermissionMedium, $BodyAuthorizedVlansHigh, $BodyPermissionHigh))
+    foreach ($item in ($BodyComment, $BodyActive, $BodyStaticIps, $BodyInventory,
+        $BodyObsoleteEndpointExpire, $BodyAuthorizedVlans, $BodyEndpointGroupId))
     {
       if ($item)
       {
@@ -263,11 +206,12 @@ function Update-MacmonEndpointGroupProperty
       }
     }
     $Body = $Body.TrimEnd() -replace ',$'
+    $Body
     if ($Body)
     {
-      $BaseURL = ('https://{0}:{1}/api/v{2}/endpointgroups' -f $HostName, $TCPPort, $ApiVersion)
-      $SessionURL = ('{0}/{1}' -f $BaseURL, $ID)
-      if ($PSCmdlet.ShouldProcess('EndpointGroup: {0}' -f $ID))
+      $BaseURL = ('https://{0}:{1}/api/v{2}/endpoints' -f $HostName, $TCPPort, $ApiVersion)
+      $SessionURL = ('{0}/{1}' -f $BaseURL, $MACAddress)
+      if ($PSCmdlet.ShouldProcess('EndpointGroup: {0}' -f $MACAddress))
       {
         Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -BodyBrackets $Body -Method 'Patch'
       }
