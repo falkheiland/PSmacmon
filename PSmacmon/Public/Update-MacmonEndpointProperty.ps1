@@ -77,9 +77,8 @@ function Update-MacmonEndpointProperty
       Active                 = 'False'
       StaticIps              = '192.168.1.1', '10.10.10.11'
       Inventory              = '012345'
-      ExpireTime             = '2022-08-23T10:05:00Z'
-      #AuthorizedVlans        = '10', '20', '30'
-      AuthorizedVlans        = 'vlanA'
+      #ExpireTime             = '2022-08-23T10:05:00Z' #API bug
+      #AuthorizedVlans        = '10', '20', '30' #API bug
       EndpointGroupId        = 11
     }
     Update-MacmonEndpointProperty @Properties
@@ -134,12 +133,14 @@ function Update-MacmonEndpointProperty
     [string]
     $Inventory,
 
+    #API bug
     #'2018-08-23T10:05:00Z'
-    [datetime]
-    $ExpireTime,
+    #[datetime]
+    #$ExpireTime,
 
-    [string[]]
-    $AuthorizedVlans,
+    #API bug
+    #[string[]]
+    #$AuthorizedVlans,
 
     [int]
     $EndpointGroupId
