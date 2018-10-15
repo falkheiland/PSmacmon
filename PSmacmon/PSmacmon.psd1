@@ -78,6 +78,7 @@
     'Get-MacmonNetworkDeviceClass'
     'Get-MacmonNetworkDeviceGroup'
     'Get-MacmonNetworkSegment'
+    'Get-MacmonReport'
     'Get-MacmonSetting'
     'Get-MacmonSystem'
     'Get-MacmonUserProperty'
@@ -85,6 +86,7 @@
     'New-MacmonEndpoint'
     'New-MacmonEndpointGroup'
     'New-MacmonNetworkDevice'
+    'Remove-MacmonEndpointProperty'
     'Update-MacmonEndpointGroupProperty'
     'Update-MacmonEndpointProperty'
   )

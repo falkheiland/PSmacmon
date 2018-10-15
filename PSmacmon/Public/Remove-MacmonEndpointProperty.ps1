@@ -1,4 +1,4 @@
-function Update-MacmonEndpointProperty
+function Remove-MacmonEndpointProperty
 {
   <#
     .SYNOPSIS
@@ -66,23 +66,22 @@ function Update-MacmonEndpointProperty
 
     .EXAMPLE
     $Credential = Get-Credential -Message 'Enter your credentials'
-    Update-MacmonEndpointProperty -Hostname 'MACMONSERVER' -Credential $Credential -MACAddress '8C-73-6E-0B-33-6E' -Comment 'New Comment'
-    #Ask for credential then update comment of endpoint with MACAddress '8C-73-6E-0B-33-6E'
+    Remove-MacmonEndpointProperty -Hostname 'MACMONSERVER' -Credential $Credential -MACAddress '8C-73-6E-0B-33-6E' -Comment
+    #Ask for credential then remove comment of endpoint with MACAddress '8C-73-6E-0B-33-6E'
 
     .EXAMPLE
     $Properties = @{
       Hostname               = 'MACMONSERVER'
       MACAddress             = '8C-73-6E-0B-33-6E'
-      Comment                = 'New Comment'
-      Active                 = 'False'
-      StaticIps              = '192.168.1.1', '10.10.10.11'
-      Inventory              = '012345'
-      #ExpireTime             = '2022-08-23T10:05:00Z' #API bug
-      #AuthorizedVlans        = '10', '20', '30' #API bug
-      EndpointGroupId        = 11
+      Comment                = $true
+      StaticIps              = $true
+      Inventory              = $true
+      ExpireTime             = $true
+      AuthorizedVlans        = $true
+      EndpointGroupId        = $true
     }
-    Update-MacmonEndpointProperty @Properties
-    #update endpoint with MACAddress '8C-73-6E-0B-33-6E' (all provided properties)
+    Remove-MacmonEndpointProperty @Properties
+    #remove all supported properties from endpoint with MACAddress '8C-73-6E-0B-33-6E'
 
     .OUTPUTS
     none
@@ -119,30 +118,22 @@ function Update-MacmonEndpointProperty
     [string]
     $MACAddress,
 
-    [string]
+    [switch]
     $Comment,
 
-    [string]
-    [ValidateSet('True', 'False')]
-    $Active,
-
-    [string[]]
-    [ValidateScript( {$_ -match [IPAddress]$_ })]
+    [switch]
     $StaticIps,
 
-    [string]
+    [switch]
     $Inventory,
 
-    #API bug
-    #'2018-08-23T10:05:00Z'
-    #[datetime]
-    #$ExpireTime,
+    [switch]
+    $ExpireTime,
 
-    #API bug
-    #[string[]]
-    #$AuthorizedVlans,
+    [switch]
+    $AuthorizedVlans,
 
-    [int]
+    [switch]
     $EndpointGroupId
   )
 
@@ -155,60 +146,46 @@ function Update-MacmonEndpointProperty
     if ($Comment)
     {
       $BodyComment = [ordered]@{
-        op    = 'replace'
-        path  = '/comment'
-        value = $Comment
-      } | ConvertTo-Json
-    }
-    if ($Active)
-    {
-      $BodyActive = [ordered]@{
-        op    = 'replace'
-        path  = '/active'
-        value = $Active
+        op   = 'remove'
+        path = '/comment'
       } | ConvertTo-Json
     }
     if ($StaticIps)
     {
       $BodyStaticIps = [ordered]@{
-        op    = 'replace'
-        path  = '/staticIps'
-        value = $StaticIps
+        op   = 'remove'
+        path = '/staticIps'
       } | ConvertTo-Json
     }
     if ($Inventory)
     {
       $BodyInventory = [ordered]@{
-        op    = 'replace'
-        path  = '/inventory'
-        value = $Inventory
+        op   = 'remove'
+        path = '/inventory'
       } | ConvertTo-Json
     }
     if ($ExpireTime)
     {
       $BodyExpireTime = [ordered]@{
-        op    = 'replace'
-        path  = '/expireTime'
-        value = $ExpireTime
+        op   = 'remove'
+        path = '/expireTime'
       } | ConvertTo-Json
     }
     if ($AuthorizedVlans)
     {
       $BodyAuthorizedVlans = [ordered]@{
-        op    = 'replace'
-        path  = '/authorizedVlans'
-        value = $AuthorizedVlans
+        op   = 'remove'
+        path = '/authorizedVlans'
       } | ConvertTo-Json
     }
     if ($EndpointGroupId)
     {
       $BodyEndpointGroupId = [ordered]@{
-        op    = 'replace'
-        path  = '/endpointGroupId'
-        value = $EndpointGroupId
+        op   = 'remove'
+        path = '/endpointGroupId'
       } | ConvertTo-Json
     }
-    foreach ($item in ($BodyComment, $BodyActive, $BodyStaticIps, $BodyInventory,
+    foreach ($item in ($BodyComment, $BodyStaticIps, $BodyInventory,
         $BodyExpireTime, $BodyAuthorizedVlans, $BodyEndpointGroupId))
     {
       if ($item)
