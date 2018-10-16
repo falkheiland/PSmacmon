@@ -19,8 +19,8 @@ function Get-MacmonNetworkSegment
     .PARAMETER Credential
     Credentials for the macmon NAC
 
-    .PARAMETER Name
-    Name of the network segment
+    .PARAMETER ID
+    ID of the network segment ('192.168.80.0/255.255.255.0')
 
     .EXAMPLE
     $Credential = Get-Credential -Message 'Enter your credentials'
@@ -60,7 +60,7 @@ function Get-MacmonNetworkSegment
 
     [Parameter(ValueFromPipeline)]
     [string]
-    $Id
+    $ID
   )
 
   begin
@@ -70,7 +70,7 @@ function Get-MacmonNetworkSegment
   {
     Invoke-MacmonTrustSelfSignedCertificate
     $BaseURL = ('https://{0}:{1}/api/v{2}/networksegments' -f $HostName, $TCPPort, $ApiVersion)
-    Switch ($Id)
+    Switch ($ID)
     {
       ''
       {
@@ -79,7 +79,7 @@ function Get-MacmonNetworkSegment
       }
       default
       {
-        $SessionURL = ('{0}/{1}' -f $BaseURL, ($Id -replace '/', '%2F'))
+        $SessionURL = ('{0}/{1}' -f $BaseURL, ($ID -replace '/', '%2F'))
         $SessionURL
         Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Method 'Get'
       }
