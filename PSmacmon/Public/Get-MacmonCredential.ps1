@@ -2,10 +2,10 @@ function Get-MacmonCredential
 {
   <#
     .SYNOPSIS
-    Get Credentialfrom the macmon NAC via RESTAPI.
+    Get Credential from the macmon NAC via RESTAPI.
 
     .DESCRIPTION
-    Get Credentialfrom the macmon NAC via RESTAPI.
+    Get Credential from the macmon NAC via RESTAPI.
 
     .PARAMETER HostName
     IP-Address or Hostname of the macmon NAC
