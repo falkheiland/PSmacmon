@@ -67,7 +67,7 @@ function Update-MacmonEndpointGroupProperty
     .EXAMPLE
     $Credential = Get-Credential -Message 'Enter your credentials'
     Update-MacmonEndpointGroupProperty -Hostname 'MACMONSERVER' -Credential $Credential -ID 187 -Name 'New Name'
-    #Ask for credential then update endpointgroup with ID 187 (minimum requirement)
+    #Ask for credential then update name of endpointgroup with ID 187
 
     .EXAMPLE
     $Properties = @{
@@ -128,8 +128,6 @@ function Update-MacmonEndpointGroupProperty
     [string]
     $Description,
 
-    #[bool]
-    #$MacStatisticActive,
     [string]
     $MacStatisticActive,
 

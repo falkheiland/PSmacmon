@@ -19,9 +19,6 @@ function Get-MacmonSystem
     .PARAMETER Credential
     Credentials for the macmon NAC
 
-    .PARAMETER Version
-    Get the version of the system
-
     .PARAMETER Documentation
     Get the API docu as swagger JSON
 
@@ -30,6 +27,9 @@ function Get-MacmonSystem
 
     .PARAMETER Uptime
     Get up time of the system in milliseconds
+
+    .PARAMETER Version
+    Get the version of the system
 
     .EXAMPLE
     $Credential = Get-Credential -Message 'Enter your credentials'

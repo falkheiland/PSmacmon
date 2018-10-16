@@ -19,47 +19,30 @@ function New-MacmonEndpoint
     .PARAMETER Credential
     Credentials for the macmon NAC
 
-    .PARAMETER Name
-    Unique name of the group
+    .PARAMETER MACAddress
+    MAC address of the endpoint
 
-    .PARAMETER Description
-    Description of the group
+    .PARAMETER Comment
+    Comments about the endpoint
 
-    .PARAMETER MacStatisticActive
-    Enables the gathering of online statistics for this group. (Default $true)
+    .PARAMETER Active
+    An inactive (deactivated) corporate device is evaluated as unauthorized. (Default $true)
 
-    .PARAMETER MacValidity
-    Validity duration of the MAC addresses in the group in days. (Default 0 =  no specification)
+    .PARAMETER IPAddress
+    Preset IP address(es) of the endpoint
 
-    .PARAMETER
-    Number of days until no longer discovered and not manually changed MAC addresses are deenabled or deleted in the group.
-    A value of 0 disables the check of the obsolete_endpoint_expire for the group.
-    In this case, the setting configured under Settings --> Scan engine is no longer taken into consideration for the group.
-    If an value of -1 is specified in the group, then the obsolete_mac_expire configured in the settings is used.
-    (0 = deactivated, default -1 = use global setting)
+    .PARAMETER Inventory
+    Inventory number of the endpoint.
 
-    .PARAMETER AuthorizedVlansLow
-    Authorized VLANs for authentication only based on MAC address
-    (e.g. MAC address detected when scanning the switch interface or MAB - MAC Authentication Bypass) (MAC address only)
+    .PARAMETER ExpireTime
+    Defines the time after which the endpoint is automatically deactivated or deleted,
+    depending on the scan engine setting endpoint_expire_action.
 
-    .PARAMETER PermissionLow
-    Permission for authentication only based on MAC address
-    (e.g. MAC address detected when scanning the switch interface or MAB - MAC Authentication Bypass) (MAC address only)
-    (1 Accept only (without VLAN); 2 Accept with VLAN; 3  Accept and VLAN (Default))
+    .PARAMETER AuthorizedVlans
+    Blank space separated list of permitted VLAN IDs or VLAN names
 
-    .PARAMETER AuthorizedVlansMedium
-    Authorized VLANs for authentication with identity and password via 802.1X
-
-    .PARAMETER PermissionMedium
-    Permission for authentication with identity and password via 802.1X
-    (1 Accept only (without VLAN); 2 Accept with VLAN; 3  Accept and VLAN (Default))
-
-    .PARAMETER AuthorizedVlansHigh
-    Authorized VLANs for authentication with certificate via 802.1X
-
-    .PARAMETER PermissionHigh
-    Permission for authentication with certificate via 802.1X
-    (1 Accept only (without VLAN); 2 Accept with VLAN; 3  Accept and VLAN (Default))
+    .PARAMETER EndpointGroupId
+    ID of the Group of the endpoint
 
     .EXAMPLE
     $Credential = Get-Credential -Message 'Enter your credentials'
@@ -82,7 +65,7 @@ function New-MacmonEndpoint
     #Create new endpoint with all supported (by function) properties
 
     .OUTPUTS
-    ID for the new endpointgroup
+    The MAC address of the new endpoint
 
     .LINK
     https://github.com/falkheiland/PSmacmon
