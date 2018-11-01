@@ -183,10 +183,10 @@ function New-MacmonNetworkDevice
       $Body.add('credentialIds', $CredentialIds)
     }
     $Body = $Body | ConvertTo-Json
-$Body
+
     $BaseURL = ('https://{0}:{1}/api/v{2}/networkdevices' -f $HostName, $TCPPort, $ApiVersion)
     $SessionURL = ('{0}' -f $BaseURL)
-    if ($PSCmdlet.ShouldProcess('network deviceGroup: {0}' -f $Name))
+    if ($PSCmdlet.ShouldProcess('network device: {0}' -f $Name))
     {
       Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Body $Body -Method 'Post'
     }
