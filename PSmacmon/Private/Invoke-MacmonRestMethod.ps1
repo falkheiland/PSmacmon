@@ -111,7 +111,7 @@ function Invoke-MacmonRestMethod
         {
           Write-Warning -Message ('Internal server error. SessionURL: {0} Method: {1}' -f $SessionURL, $Method)
         }
-        901
+        911
         {
           Write-Warning -Message ('Application error. SessionURL: {0} Method: {1}' -f $SessionURL, $Method)
         }
