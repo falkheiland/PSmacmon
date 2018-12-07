@@ -39,7 +39,7 @@ function Get-MacmonLicenseOption
 
     #>
 
-  [CmdletBinding()]
+  [CmdletBinding(DefaultParameterSetName = 'All')]
   param (
     [Parameter(Mandatory)]
     [string]
@@ -58,29 +58,61 @@ function Get-MacmonLicenseOption
     [System.Management.Automation.Credential()]
     $Credential = (Get-Credential -Message 'Enter your credentials'),
 
-    [Parameter(ValueFromPipeline)]
+    [Parameter(ValueFromPipeline, ParameterSetName = 'Name')]
     [string]
-    $Name
+    $Name,
+
+    [string]
+    $Fields,
+
+    [Parameter(ParameterSetName = 'All')]
+    [string]
+    $Sort,
+
+    [Parameter(ParameterSetName = 'All')]
+    [int]
+    $Limit,
+
+    [Parameter(ParameterSetName = 'All')]
+    [int]
+    $Offset,
+
+    [Parameter(ParameterSetName = 'All')]
+    [string]
+    $Filter
   )
 
   begin
   {
+    Invoke-MacmonTrustSelfSignedCertificate
+    $UriArray = @($HostName, $TCPPort, $ApiVersion)
+    $BaseURL = ('https://{0}:{1}/api/v{2}/licenseoptions' -f $UriArray)
+    $FunctionStringParams = [ordered]@{
+      Fields = $Fields
+      Sort   = $Sort
+      Limit  = $Limit
+      Offset = $Offset
+      Filter = $Filter
+    }
+    $FunctionString = Get-MacmonFunctionString @FunctionStringParams
+    $Params = @{
+      Credential = $Credential
+      Method     = 'Get'
+    }
   }
   process
   {
-    Invoke-MacmonTrustSelfSignedCertificate
-    $BaseURL = ('https://{0}:{1}/api/v{2}/licenseoptions' -f $HostName, $TCPPort, $ApiVersion)
-    Switch ($Name)
+    Switch ($PsCmdlet.ParameterSetName)
     {
-      ''
+      'All'
       {
-        $SessionURL = ('{0}' -f $BaseURL)
-        (Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Method 'Get').SyncRoot
+        $params.Add('Uri', ('{0}{1}' -f $BaseURL, $FunctionString))
+        (Invoke-MacmonRestMethod @Params).SyncRoot
       }
-      default
+      'Name'
       {
-        $SessionURL = ('{0}/{1}' -f $BaseURL, $Name)
-        Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Method 'Get'
+        $params.Add('Uri', ('{0}/{1}{2}' -f $BaseURL, $MACAddress, $FunctionString))
+        Invoke-MacmonRestMethod @Params
       }
     }
   }

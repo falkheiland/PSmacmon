@@ -89,7 +89,8 @@ function Get-MacmonNetworkDevice
   begin
   {
     Invoke-MacmonTrustSelfSignedCertificate
-    $BaseURL = ('https://{0}:{1}/api/v{2}/networkdevices' -f $HostName, $TCPPort, $ApiVersion)
+    $UriArray = @($HostName, $TCPPort, $ApiVersion)
+    $BaseURL = ('https://{0}:{1}/api/v{2}/networkdevices' -f $UriArray)
     $FunctionStringParams = [ordered]@{
       Fields = $Fields
       Sort   = $Sort
@@ -98,6 +99,10 @@ function Get-MacmonNetworkDevice
       Filter = $Filter
     }
     $FunctionString = Get-MacmonFunctionString @FunctionStringParams
+    $Params = @{
+      Credential = $Credential
+      Method     = 'Get'
+    }
   }
   process
   {
@@ -105,13 +110,13 @@ function Get-MacmonNetworkDevice
     {
       'All'
       {
-        $SessionURL = ('{0}{1}' -f $BaseURL, $FunctionString)
-        (Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Method 'Get').SyncRoot
+        $params.Add('Uri', ('{0}{1}' -f $BaseURL, $FunctionString))
+        (Invoke-MacmonRestMethod @Params).SyncRoot
       }
       'ID'
       {
-        $SessionURL = ('{0}/{1}{2}' -f $BaseURL, $ID, $FunctionString)
-        Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Method 'Get'
+        $params.Add('Uri', ('{0}/{1}{2}' -f $BaseURL, $ID, $FunctionString))
+        Invoke-MacmonRestMethod @Params
       }
     }
   }

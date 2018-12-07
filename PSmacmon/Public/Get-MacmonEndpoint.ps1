@@ -55,7 +55,6 @@ function Get-MacmonEndpoint
 
     #>
 
-  #[CmdletBinding()]
   [CmdletBinding(DefaultParameterSetName = 'All')]
   param (
     [Parameter(Mandatory)]
@@ -103,7 +102,8 @@ function Get-MacmonEndpoint
   begin
   {
     Invoke-MacmonTrustSelfSignedCertificate
-    $BaseURL = ('https://{0}:{1}/api/v{2}/endpoints' -f $HostName, $TCPPort, $ApiVersion)
+    $UriArray = @($HostName, $TCPPort, $ApiVersion)
+    $BaseURL = ('https://{0}:{1}/api/v{2}/endpoints' -f $UriArray)
     $FunctionStringParams = [ordered]@{
       Fields = $Fields
       Sort   = $Sort
@@ -112,6 +112,10 @@ function Get-MacmonEndpoint
       Filter = $Filter
     }
     $FunctionString = Get-MacmonFunctionString @FunctionStringParams
+    $Params = @{
+      Credential = $Credential
+      Method     = 'Get'
+    }
   }
   process
   {
@@ -119,13 +123,13 @@ function Get-MacmonEndpoint
     {
       'All'
       {
-        $SessionURL = ('{0}{1}' -f $BaseURL, $FunctionString)
-        (Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Method 'Get').SyncRoot
+        $params.Add('Uri', ('{0}{1}' -f $BaseURL, $FunctionString))
+        (Invoke-MacmonRestMethod @Params).SyncRoot
       }
       'MAC'
       {
-        $SessionURL = ('{0}/{1}{2}' -f $BaseURL, $MACAddress, $FunctionString)
-        Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Method 'Get'
+        $params.Add('Uri', ('{0}/{1}{2}' -f $BaseURL, $MACAddress, $FunctionString))
+        Invoke-MacmonRestMethod @Params
       }
     }
   }

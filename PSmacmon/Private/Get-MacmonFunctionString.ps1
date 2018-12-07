@@ -9,7 +9,7 @@ function Get-MacmonFunctionString
     Offset = '2'
     Sort   = 'active,address'
   }
-  Get-MacmonFunctionString @Params
+  Add-AppvClientPackage-MacmonFunctionString @Params
 
   Get-MacmonFunctionString -Filter 'active==true and networkDeviceGroup.name == "Switch"' -Fields 'id,userValues.*.value' -Sort 'active,address'
   Get-MacmonFunctionString -Filter 'active==true and networkDeviceGroup.name == "Switch"'
