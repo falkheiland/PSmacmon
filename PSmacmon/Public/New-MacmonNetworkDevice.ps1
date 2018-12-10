@@ -58,8 +58,8 @@ function New-MacmonNetworkDevice
 
     .EXAMPLE
     $Credential = Get-Credential -Message 'Enter your credentials'
-    New-MacmonNetworkDevice -Hostname 'MACMONSERVER' -Credential $Credential -Address 'NEWSWITCH'
-    #Ask for credential then create new network device with address 'NEWSWITCH' (minimum requirement)
+    New-MacmonNetworkDevice -Hostname 'MACMONSERVER' -Credential $Credential -Address '192.168.0.1'
+    #Ask for credential then create new network device with address '192.168.0.1' (minimum requirement)
 
     .EXAMPLE
     $Properties = @{
@@ -149,11 +149,16 @@ function New-MacmonNetworkDevice
 
   begin
   {
+    Invoke-MacmonTrustSelfSignedCertificate
+    $UriArray = @($HostName, $TCPPort, $ApiVersion)
+    $BaseURL = ('https://{0}:{1}/api/v{2}/networkdevices' -f $UriArray)
+    $Params = @{
+      Credential = $Credential
+      Method     = 'Post'
+    }
   }
   process
   {
-    Invoke-MacmonTrustSelfSignedCertificate
-
     $Body = @{
       address               = $Address
       active                = $Active
@@ -182,13 +187,11 @@ function New-MacmonNetworkDevice
     {
       $Body.add('credentialIds', $CredentialIds)
     }
-    $Body = $Body | ConvertTo-Json
-
-    $BaseURL = ('https://{0}:{1}/api/v{2}/networkdevices' -f $HostName, $TCPPort, $ApiVersion)
-    $SessionURL = ('{0}' -f $BaseURL)
+    $params.Add('Body', ($Body | ConvertTo-Json))
+    $params.Add('Uri', ('{0}' -f $BaseURL))
     if ($PSCmdlet.ShouldProcess('network device: {0}' -f $Name))
     {
-      Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Body $Body -Method 'Post'
+      Invoke-MacmonRestMethod @Params
     }
   }
   end
