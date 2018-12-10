@@ -127,11 +127,16 @@ function New-MacmonEndpoint
 
   begin
   {
+    Invoke-MacmonTrustSelfSignedCertificate
+    $UriArray = @($HostName, $TCPPort, $ApiVersion)
+    $BaseURL = ('https://{0}:{1}/api/v{2}/endpoints' -f $UriArray)
+    $Params = @{
+      Credential = $Credential
+      Method     = 'Post'
+    }
   }
   process
   {
-    Invoke-MacmonTrustSelfSignedCertificate
-
     $Body = [ordered]@{
       mac             = $MACAddress
       comment         = $Comment
@@ -148,13 +153,11 @@ function New-MacmonEndpoint
     {
       $Body.add('endpointGroupId', $EndpointGroupId)
     }
-    $Body = $Body | ConvertTo-Json
-
-    $BaseURL = ('https://{0}:{1}/api/v{2}/endpoints' -f $HostName, $TCPPort, $ApiVersion)
-    $SessionURL = ('{0}' -f $BaseURL)
+    $params.Add('Body', ($Body | ConvertTo-Json))
+    $params.Add('Uri', ('{0}' -f $BaseURL))
     if ($PSCmdlet.ShouldProcess('EndpointGroup: {0}' -f $Name))
     {
-      Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Body $Body -Method 'Post'
+      Invoke-MacmonRestMethod @Params
     }
   }
   end
