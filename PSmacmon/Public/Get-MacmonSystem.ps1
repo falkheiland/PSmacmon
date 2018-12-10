@@ -94,31 +94,36 @@ function Get-MacmonSystem
 
   begin
   {
+    Invoke-MacmonTrustSelfSignedCertificate
+    $UriArray = @($HostName, $TCPPort, $ApiVersion)
+    $BaseURL = ('https://{0}:{1}/api/v{2}/system' -f $UriArray)
+    $Params = @{
+      Credential = $Credential
+      Method     = 'Get'
+    }
   }
   process
   {
-    Invoke-MacmonTrustSelfSignedCertificate
-    $BaseURL = ('https://{0}:{1}/api/v{2}/system' -f $HostName, $TCPPort, $ApiVersion)
     switch ($PsCmdlet.ParameterSetName)
     {
       'Version'
       {
-        $SessionURL = ('{0}/version' -f $BaseURL)
+        $params.Add('Uri', ('{0}/version' -f $BaseURL))
       }
       'Documentation'
       {
-        $SessionURL = ('{0}/docu' -f $BaseURL)
+        $params.Add('Uri', ('{0}/docu' -f $BaseURL))
       }
       'IPs'
       {
-        $SessionURL = ('{0}/ips' -f $BaseURL)
+        $params.Add('Uri', ('{0}/ips' -f $BaseURL))
       }
       'Uptime'
       {
-        $SessionURL = ('{0}/sys-up-time' -f $BaseURL)
+        $params.Add('Uri', ('{0}/sys-up-time' -f $BaseURL))
       }
     }
-    Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Method 'Get'
+    Invoke-MacmonRestMethod @Params
   }
   end
   {
