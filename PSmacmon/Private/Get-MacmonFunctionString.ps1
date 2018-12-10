@@ -33,7 +33,10 @@ function Get-MacmonFunctionString
     $Offset,
 
     [string]
-    $Filter
+    $Filter,
+
+    [string]
+    $Format
   )
 
   begin
