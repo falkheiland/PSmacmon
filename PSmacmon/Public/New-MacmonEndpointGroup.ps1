@@ -154,11 +154,16 @@ function New-MacmonEndpointGroup
 
   begin
   {
+    Invoke-MacmonTrustSelfSignedCertificate
+    $UriArray = @($HostName, $TCPPort, $ApiVersion)
+    $BaseURL = ('https://{0}:{1}/api/v{2}/endpointgroups' -f $UriArray)
+    $Params = @{
+      Credential = $Credential
+      Method     = 'Post'
+    }
   }
   process
   {
-    Invoke-MacmonTrustSelfSignedCertificate
-
     $Body = @{
       name                  = $Name
       description           = $Description
@@ -175,13 +180,11 @@ function New-MacmonEndpointGroup
     {
       $Body.add('obsoleteEndpointExpire', $ObsoleteEndpointExpire * 86400000)
     }
-    $Body = $Body | ConvertTo-Json
-
-    $BaseURL = ('https://{0}:{1}/api/v{2}/endpointgroups' -f $HostName, $TCPPort, $ApiVersion)
-    $SessionURL = ('{0}' -f $BaseURL)
+    $params.Add('Body', ($Body | ConvertTo-Json))
+    $params.Add('Uri', ('{0}' -f $BaseURL))
     if ($PSCmdlet.ShouldProcess('EndpointGroup: {0}' -f $Name))
     {
-      Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Body $Body -Method 'Post'
+      Invoke-MacmonRestMethod @Params
     }
   }
   end
