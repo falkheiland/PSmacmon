@@ -20,8 +20,8 @@ function Get-MacmonReport
     .PARAMETER Credential
     Credentials for the macmon NAC
 
-    .PARAMETER ReportID
-    ReportID of the report (e.g. 'authorizedMacs0cbc6611f5540bd0809a388dc95a615b')
+    .PARAMETER ID
+    ID of the report (e.g. 'authorizedMacs0cbc6611f5540bd0809a388dc95a615b')
 
     .PARAMETER Format
     Format of the Result ('csv', ('pdf' or 'xlsx' does not work atm)), (Default: 'csv').
@@ -31,7 +31,7 @@ function Get-MacmonReport
 
     .EXAMPLE
     $Credential = Get-Credential -Message 'Enter your credentials'
-    Get-MacmonReport -Hostname 'MACMONSERVER' -Credential $Credential -ReportID 'authorizedMacs0cbc6611f5540bd0809a388dc95a615b'
+    Get-MacmonReport -Hostname 'MACMONSERVER' -Credential $Credential -ID 'authorizedMacs0cbc6611f5540bd0809a388dc95a615b'
     #Ask for credential then get result of the report with ReportID 'authorizedMacs0cbc6611f5540bd0809a388dc95a615b' from macmon NAC using provided credential
 
     .EXAMPLE
@@ -67,7 +67,7 @@ function Get-MacmonReport
 
     [Parameter(Mandatory, ValueFromPipeline)]
     [string]
-    $ReportID,
+    $ID,
 
     #[ValidateSet('csv', 'pdf', 'xlsx')] #'pdf' and 'xlsx' does not work atm
     [ValidateSet('csv')]
@@ -86,16 +86,25 @@ function Get-MacmonReport
 
   begin
   {
+    Invoke-MacmonTrustSelfSignedCertificate
+    $UriArray = @($HostName, $TCPPort, $ApiVersion)
+    $BaseURL = ('https://{0}:{1}/api/v{2}/reports' -f $UriArray)
+    $FunctionStringParams = [ordered]@{
+      Format = $Format
+    }
+    $FunctionString = Get-MacmonFunctionString @FunctionStringParams
+    $Params = @{
+      Credential = $Credential
+      Method     = 'Get'
+    }
   }
   process
   {
-    Invoke-MacmonTrustSelfSignedCertificate
-    $BaseURL = ('https://{0}:{1}/api/v{2}/reports' -f $HostName, $TCPPort, $ApiVersion)
-    $SessionURL = ('{0}/{1}?format={2}' -f $BaseURL, $ReportID, $Format)
-    $Result = Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Method 'Get'
+    $params.Add('Uri', ('{0}/{1}{2}' -f $BaseURL, $ID, $FunctionString))
+    $Result = Invoke-MacmonRestMethod @Params
     if ($Path)
     {
-      $Result | Out-File -FilePath ('{0}{1}.{2}' -f $Path, $ReportID, $Format)
+      $Result | Out-File -FilePath ('{0}{1}.{2}' -f $Path, $ID, $Format)
     }
     else
     {
