@@ -89,14 +89,13 @@ function Update-MacmonEndpointProperty
       'Active',
       'StaticIps',
       'Inventory',
-      'ExpireTime',
       'AuthorizedVlans',
       'EndpointGroupId')]
     [string]
     $Property,
 
     [Parameter(Mandatory)]
-    [string]
+    [string[]]
     $Value
   )
 
@@ -118,6 +117,8 @@ function Update-MacmonEndpointProperty
       $Params.Add('Uri', ('{0}/{1}' -f $BaseURL, $MACAddress))
       if ($PSCmdlet.ShouldProcess('EndpointGroup: {0}' -f $MACAddress))
       {
+        #$Params.Uri
+        #$Params.Body
         Invoke-MacmonRestMethod @Params
       }
     }

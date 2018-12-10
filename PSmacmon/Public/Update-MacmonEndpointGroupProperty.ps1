@@ -99,7 +99,7 @@ function Update-MacmonEndpointGroupProperty
     $Property,
 
     [Parameter(Mandatory)]
-    [string]
+    [string[]]
     $Value
   )
 

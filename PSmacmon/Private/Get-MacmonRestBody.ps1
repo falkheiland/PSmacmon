@@ -3,7 +3,8 @@ function Get-MacmonRestBody
   <#
   .EXAMPLE
   Get-MacmonRestBody -Property Comment -Op 'remove'
-  Get-MacmonRestBody -Property Comment -Op 'replace' -Value 'New Comment'
+  Get-MacmonRestBody -Property staticIps -Op 'replace' -Value '192.168.3.3', '192.168.3.4'
+  Get-MacmonRestBody -Property staticIps -Op 'replace' -Value '192.168.3.3'
   #>
 
   [CmdletBinding()]
@@ -16,7 +17,7 @@ function Get-MacmonRestBody
     [string]
     $Op,
 
-    [string]
+    [string[]]
     $Value
   )
 
@@ -31,7 +32,12 @@ function Get-MacmonRestBody
     }
     if ($Value)
     {
-      $Result.Add('value', $Value)
+      #[array]$ValueArray = foreach ($item in $Value)
+      $ValueArray = foreach ($item in $Value)
+      {
+        $item
+      }
+      $Result.Add('value', $ValueArray)
     }
     ConvertTo-Json -InputObject @($Result) -Depth 10
   }
