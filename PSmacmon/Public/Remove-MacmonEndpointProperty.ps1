@@ -22,21 +22,42 @@ function Remove-MacmonEndpointProperty
     .PARAMETER MACAddress
     MAC address of the endpoint
 
-    .PARAMETER Property
-    Property to remove ('Comment', 'StaticIps', 'Inventory', 'ExpireTime', 'AuthorizedVlans', 'EndpointGroupId')
+    .PARAMETER Comment
+    Remove comments about the endpoint
+
+    .PARAMETER StaticIps
+    Remove preset IP address(es) of the endpoint
+
+    .PARAMETER Inventory
+    Remove inventory number of the endpoint.
+
+    .PARAMETER ExpireTime
+    Remove the time after which the endpoint is automatically deactivated or deleted,
+    depending on the scan engine setting endpoint_expire_action.
+
+    .PARAMETER AuthorizedVlans
+    Remove blank space separated list of permitted VLAN IDs or VLAN names
+
+    .PARAMETER EndpointGroupId
+    Remove ID of the group of the endpoint
 
     .EXAMPLE
     $Credential = Get-Credential -Message 'Enter your credentials'
-    Remove-MacmonEndpointProperty -Hostname 'MACMONSERVER' -Credential $Credential -MACAddress '8C-73-6E-0B-33-6E' -Property Comment
+    Remove-MacmonEndpointProperty -Hostname 'MACMONSERVER' -Credential $Credential -MACAddress '8C-73-6E-0B-33-6E' -Comment
     #Ask for credential then remove comment of endpoint with MACAddress '8C-73-6E-0B-33-6E'
 
     .EXAMPLE
     $Properties = @{
-      Hostname = 'MACMONSERVER'
-      Property = 'Comment'
+      Hostname               = 'MACMONSERVER'
+      MACAddress             = '8C-73-6E-0B-33-6E'
+      Comment                = $true
+      StaticIps              = $true
+      Inventory              = $true
+      AuthorizedVlans        = $true
+      EndpointGroupId        = $true
     }
-    '8C-73-6E-0B-33-6E', '8C-73-6E-0A-34-21'| Remove-MacmonEndpointProperty @Properties
-    #remove comment from endpoints with MACAddress '8C-73-6E-0B-33-6E' and '8C-73-6E-0A-34-21'
+    Remove-MacmonEndpointProperty @Properties
+    #remove all supported properties from endpoint with MACAddress '8C-73-6E-0B-33-6E'
 
     .OUTPUTS
     none
@@ -68,15 +89,25 @@ function Remove-MacmonEndpointProperty
     [System.Management.Automation.Credential()]
     $Credential = (Get-Credential -Message 'Enter your credentials'),
 
-    [Parameter(ValueFromPipeline, Mandatory)]
+    [Parameter(Mandatory)]
     [ValidatePattern('(([0-9A-Fa-f]{2}[-:]){5}[0-9A-Fa-f]{2})|(([0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4})')]
     [string]
     $MACAddress,
 
-    [Parameter(Mandatory)]
-    [ValidateSet('Comment', 'StaticIps', 'Inventory', 'ExpireTime', 'AuthorizedVlans', 'EndpointGroupId')]
-    [string]
-    $Property
+    [switch]
+    $Comment,
+
+    [switch]
+    $StaticIps,
+
+    [switch]
+    $Inventory,
+
+    [switch]
+    $AuthorizedVlans,
+
+    [switch]
+    $EndpointGroupId
   )
 
   begin
@@ -88,17 +119,51 @@ function Remove-MacmonEndpointProperty
       Credential = $Credential
       Method     = 'Patch'
     }
+    $Body = @()
+    $Op = 'remove'
   }
   process
   {
-    $Params.Add('Body', (Get-MacmonRestBody -Property $Property -Op 'remove'))
-    if ($Params.Body)
+    if ($Comment)
     {
-      $Params.Add('Uri', ('{0}/{1}' -f $BaseURL, $MACAddress))
-      if ($PSCmdlet.ShouldProcess('EndpointGroup: {0}' -f $MACAddress))
-      {
-        Invoke-MacmonRestMethod @Params
+      $Body += @{
+        op   = $Op
+        path = '/comment'
       }
+    }
+    if ($StaticIps)
+    {
+      $Body += @{
+        op   = $Op
+        path = '/staticIps'
+      }
+    }
+    if ($Inventory)
+    {
+      $Body += @{
+        op   = $Op
+        path = '/inventory'
+      }
+    }
+    if ($AuthorizedVlans)
+    {
+      $Body += @{
+        op   = $Op
+        path = '/authorizedVlans'
+      }
+    }
+    if ($EndpointGroupId)
+    {
+      $Body += @{
+        op   = $Op
+        path = '/endpointGroupId'
+      }
+    }
+    $Params.Add('Body', (ConvertTo-Json $Body))
+    $Params.Add('Uri', ('{0}/{1}' -f $BaseURL, $MACAddress))
+    if ($PSCmdlet.ShouldProcess('EndpointGroup: {0}' -f $MACAddress))
+    {
+      Invoke-MacmonRestMethod @Params
     }
   }
   end

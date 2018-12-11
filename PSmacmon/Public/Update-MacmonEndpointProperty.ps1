@@ -22,32 +22,42 @@ function Update-MacmonEndpointProperty
     .PARAMETER MACAddress
     MAC address of the endpoint
 
-        .PARAMETER Property
-    Property to update
+    .PARAMETER Comment
+    Comments about the endpoint
 
-    .PARAMETER Value
-    Value to upgrade property to
-    Comment: Comments about the endpoint
-    Active: String, True or False. An inactive (deactivated) corporate device is evaluated as unauthorized.
-    StaticIps: Preset IP address(es) of the endpoint
-    Inventory: Inventory number of the endpoint.
-    ExpireTime: Defines the time after which the endpoint is automatically deactivated or deleted,
-    depending on the scan engine setting endpoint_expire_action.
-    AuthorizedVlans: Blank space separated list of permitted VLAN IDs or VLAN names
-    EndpointGroupId: ID of the Group of the endpoint
+    .PARAMETER Active
+    String, True or False. An inactive (deactivated) corporate device is evaluated as unauthorized.
+
+    .PARAMETER IPAddress
+    Preset IP address(es) of the endpoint
+
+    .PARAMETER Inventory
+    Inventory number of the endpoint.
+
+    .PARAMETER AuthorizedVlans
+    Blank space separated list of permitted VLAN IDs or VLAN names
+
+    .PARAMETER EndpointGroupId
+    ID of the Group of the endpoint
 
     .EXAMPLE
     $Credential = Get-Credential -Message 'Enter your credentials'
     Update-MacmonEndpointProperty -Hostname 'MACMONSERVER' -Credential $Credential -MACAddress '8C-73-6E-0B-33-6E' -Comment 'New Comment'
-    Ask for credential then update comment of endpoint with MACAddress '8C-73-6E-0B-33-6E'
+    #Ask for credential then update comment of endpoint with MACAddress '8C-73-6E-0B-33-6E'
 
     .EXAMPLE
     $Properties = @{
-      Hostname        = 'MACMONSERVER'
-      AuthorizedVlans = 10,12
+      Hostname               = 'MACMONSERVER'
+      MACAddress             = '8C-73-6E-0B-33-6E'
+      Comment                = 'New Comment'
+      Active                 = 'False'
+      IPAddress              = '192.168.1.1', '10.10.10.11'
+      Inventory              = '012345'
+      AuthorizedVlans       = '10', '20', '30' #API bug
+      EndpointGroupId        = 11
     }
-    '8C-73-6E-0B-33-6E', '8C-73-6E-0D-31-4A' | Update-MacmonEndpointProperty @Properties
-    Update AuthorizedVlans for endpoints with MACAddress '8C-73-6E-0B-33-6E' and '8C-73-6E-0D-31-4A'
+    Update-MacmonEndpointProperty @Properties
+    #update endpoint with MACAddress '8C-73-6E-0B-33-6E' (all provided properties)
 
     .OUTPUTS
     none
@@ -84,21 +94,27 @@ function Update-MacmonEndpointProperty
     [string]
     $MACAddress,
 
-    [Parameter(Mandatory)]
-    [ValidateSet('Comment',
-      'Active',
-      'StaticIps',
-      'Inventory',
-      'AuthorizedVlans',
-      'EndpointGroupId')]
     [string]
-    $Property,
+    $Comment,
 
-    [Parameter(Mandatory)]
+    [string]
+    [ValidateSet('True', 'False')]
+    $Active,
+
+    [ValidateScript( {$_ -match [IPAddress]$_})]
+    [Alias('StaticIps')]
     [string[]]
-    $Value
-  )
+    $IPAddress,
 
+    [string]
+    $Inventory,
+
+    [string[]]
+    $AuthorizedVlans,
+
+    [int]
+    $EndpointGroupId
+  )
   begin
   {
     Invoke-MacmonTrustSelfSignedCertificate
@@ -108,19 +124,64 @@ function Update-MacmonEndpointProperty
       Credential = $Credential
       Method     = 'Patch'
     }
+    $Body = @()
+    $Op = 'replace'
   }
   process
   {
-    $Params.Add('Body', (Get-MacmonRestBody -Property $Property -Op 'replace' -Value $Value))
-    if ($Params.Body)
+    if ($Comment)
     {
-      $Params.Add('Uri', ('{0}/{1}' -f $BaseURL, $MACAddress))
-      if ($PSCmdlet.ShouldProcess('EndpointGroup: {0}' -f $MACAddress))
-      {
-        #$Params.Uri
-        #$Params.Body
-        Invoke-MacmonRestMethod @Params
+      $Body += @{
+        op    = $Op
+        path  = '/comment'
+        value = $Comment
       }
+    }
+    if ($Active)
+    {
+      $Body += @{
+        op    = $Op
+        path  = '/active'
+        value = $Active
+      }
+    }
+    if ($IPAddress)
+    {
+      $Body += @{
+        op    = $Op
+        path  = '/staticIps'
+        value = $IPAddress
+      }
+    }
+    if ($Inventory)
+    {
+      $Body += @{
+        op    = $Op
+        path  = '/inventory'
+        value = $Inventory
+      }
+    }
+    if ($AuthorizedVlans)
+    {
+      $Body += @{
+        op    = $Op
+        path  = '/authorizedVlans'
+        value = @($AuthorizedVlans)
+      }
+    }
+    if ($EndpointGroupId)
+    {
+      $Body += @{
+        op    = $Op
+        path  = '/endpointGroupId'
+        value = $EndpointGroupId
+      }
+    }
+    $Params.Add('Body', (ConvertTo-Json $Body))
+    $Params.Add('Uri', ('{0}/{1}' -f $BaseURL, $MACAddress))
+    if ($PSCmdlet.ShouldProcess('EndpointGroup: {0}' -f $MACAddress))
+    {
+      Invoke-MacmonRestMethod @Params
     }
   }
   end

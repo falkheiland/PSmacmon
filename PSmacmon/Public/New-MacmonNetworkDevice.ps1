@@ -28,6 +28,9 @@ function New-MacmonNetworkDevice
     .PARAMETER Nac
     True, if network access control active. (Default: False)
 
+    .PARAMETER NetworkDeviceClassId
+    Device class ID. If no device class with the respective SNMP System ID exists yet, then it is automatically created.
+
     .PARAMETER NetworkDeviceGroupId
     Device group ID. If no group is specified, only the SNMP basic data are queried from the network device.
 
@@ -64,12 +67,13 @@ function New-MacmonNetworkDevice
     .EXAMPLE
     $Properties = @{
       Hostname              = 'MACMONSERVER'
-      address               = '192.168.0.1'
+      address               = '192.168.3.1'
       active                = $true
       nac                   = $false
       ignoreHardwareChanges = $true
       enabledProtocols      = ('snmpv3', 'snmpv2c')
       interfaceStatistic    = $true
+      networkDeviceClassId  = 84
       networkDeviceGroupId  = 14
       description           = 'New Device'
       location              = 'Cabinet 1'
@@ -120,6 +124,9 @@ function New-MacmonNetworkDevice
     $Nac = $false,
 
     [int]
+    $NetworkDeviceClassId,
+
+    [int]
     $NetworkDeviceGroupId,
 
     [string]
@@ -136,8 +143,6 @@ function New-MacmonNetworkDevice
 
     [bool]
     $InterfaceStatistic = $false,
-
-    $UserValues,
 
     [ValidatePattern("^[(http(s)?):\/\/].*")]
     [string]
@@ -167,6 +172,10 @@ function New-MacmonNetworkDevice
       enabledProtocols      = $EnabledProtocols
       interfaceStatistic    = $InterfaceStatistic
     }
+    if ($NetworkDeviceClassId)
+    {
+      $Body.add('networkDeviceClassId', $NetworkDeviceClassId)
+    }
     if ($NetworkDeviceGroupId)
     {
       $Body.add('networkDeviceGroupId', $NetworkDeviceGroupId)
@@ -187,7 +196,7 @@ function New-MacmonNetworkDevice
     {
       $Body.add('credentialIds', $CredentialIds)
     }
-    $params.Add('Body', ($Body | ConvertTo-Json))
+    $params.Add('Body', (ConvertTo-Json $Body))
     $params.Add('Uri', ('{0}' -f $BaseURL))
     if ($PSCmdlet.ShouldProcess('network device: {0}' -f $Name))
     {

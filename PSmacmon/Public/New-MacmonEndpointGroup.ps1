@@ -165,22 +165,34 @@ function New-MacmonEndpointGroup
   process
   {
     $Body = @{
-      name                  = $Name
-      description           = $Description
-      macStatisticActive    = $MacStatisticActive
-      macValidity           = $MacValidity * 86400000
-      authorizedVlansLow    = $AuthorizedVlansLow
-      permissionLow         = $PermissionLow
-      authorizedVlansMedium = $AuthorizedVlansMedium
-      permissionMedium      = $PermissionMedium
-      authorizedVlansHigh   = $AuthorizedVlansHigh
-      permissionHigh        = $PermissionHigh
+      name               = $Name
+      macStatisticActive = $MacStatisticActive
+      macValidity        = $MacValidity * 86400000
+      permissionLow      = $PermissionLow
+      permissionMedium   = $PermissionMedium
+      permissionHigh     = $PermissionHigh
+    }
+    if ($Description)
+    {
+      $Body.add('description', $Description)
+    }
+    if ($AuthorizedVlansLow)
+    {
+      $Body.add('authorizedVlansLow', $AuthorizedVlansLow)
+    }
+    if ($AuthorizedVlansMedium)
+    {
+      $Body.add('authorizedVlansMedium', $AuthorizedVlansMedium)
+    }
+    if ($AuthorizedVlansHigh)
+    {
+      $Body.add('authorizedVlansHigh', $AuthorizedVlansHigh)
     }
     if ($ObsoleteEndpointExpire -ge 0)
     {
       $Body.add('obsoleteEndpointExpire', $ObsoleteEndpointExpire * 86400000)
     }
-    $params.Add('Body', ($Body | ConvertTo-Json))
+    $params.Add('Body', (ConvertTo-Json $Body))
     $params.Add('Uri', ('{0}' -f $BaseURL))
     if ($PSCmdlet.ShouldProcess('EndpointGroup: {0}' -f $Name))
     {
