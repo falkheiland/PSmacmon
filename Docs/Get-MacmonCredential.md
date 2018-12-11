@@ -32,13 +32,11 @@ Get Credential from the macmon NAC via RESTAPI.
 ### Example 1
 ```powershell
 $Params = @{
-  Hostname = 'MACMONSERVER'
+  Hostname   = 'MACMONSERVER'
   Credential = Get-Credential
 }
 Get-MacmonCredential @Params
 ```
-Get Credentials.
-
 ```
 id          : 1
 type        : SNMPv2Credential
@@ -52,17 +50,46 @@ description : Default SNMPv2c credential (r/w)
 name        : SNMP-default (r/w)
 properties  : @{read community=; traps=; write community=; contexts=}
 ```
+Get Credentials.
 
 ### Example 2
 ```powershell
-3 | Get-MacmonCredential -Hostname 'MACMONSERVER' | Select-Object -Property name, description
+$Params = @{
+  Hostname   = 'MACMONSERVER'
+  Credential = Get-Credential
+  Fields     = 'name,description'
+}
+2 | Get-MacmonCredential @Params
+```
+```
+description                      name
+-----------                      ----
+Default SNMPv2c credential (r/w) SNMP-default (r/w)
 ```
 
-Get name and description from Credential with ID 3.
+Get name and description from Credential with ID 2.
 
 ### Example 3
 ```powershell
-(Get-MacmonCredential -Hostname 'MACMONSERVER').where{$_.type -eq 'SSHCredential'}
+$Params = @{
+  Hostname   = 'MACMONSERVER'
+  Credential = Get-Credential
+  Filter     = 'type=="SSHCredential"'
+}
+Get-MacmonCredential @Params
+```
+```
+id          : 4
+type        : SSHCredential
+description :
+name        : SSH root (root)
+properties  : @{password=; enablePassword=; username=}
+
+id          : 5
+type        : SSHCredential
+description :
+name        : SSH admin (admin)
+properties  : @{password=; enablePassword=; username=}
 ```
 
 Get SSH-Credentials.
@@ -233,5 +260,5 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 [https://github.com/falkheiland/PSmacmon](https://github.com/falkheiland/PSmacmon)
 
-[https://<MACMONSERVER>/man/index.php?controller=ApiDocuController]()
+[https://MACMONSERVER/man/index.php?controller=ApiDocuController](https://MACMONSERVER/man/index.php?controller=ApiDocuController)
 
