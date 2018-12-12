@@ -35,9 +35,9 @@ function Get-MacmonReport
     #Ask for credential then get result of the report with ReportID 'authorizedMacs0cbc6611f5540bd0809a388dc95a615b' from macmon NAC using provided credential
 
     .EXAMPLE
-    'unauthorisedMacs' | Get-MacmonReport -Hostname 'MACMONSERVER' -Format 'csv' -Path 'C:\Temp\'
-    'unauthorisedMacs' | Get-MacmonReport -Hostname 'MACMONSERVER' -Format 'pdf' -Path 'C:\Temp\'
-    'unauthorisedMacs' | Get-MacmonReport -Hostname 'MACMONSERVER' -Format 'xlsx' -Path 'C:\Temp\'
+    'unauthorisedMacs' | Get-MacmonReport -Hostname 'MACMONSERVER' -Format 'csv' -Path 'C:\Temp'
+    'unauthorisedMacs' | Get-MacmonReport -Hostname 'MACMONSERVER' -Format 'pdf' -Path 'C:\Temp'
+    'unauthorisedMacs' | Get-MacmonReport -Hostname 'MACMONSERVER' -Format 'xlsx' -Path 'C:\Temp'
     #Get result of report with ReportID 'unauthorisedMacs' as file to 'C:\Temp\unauthorisedMacs.csv'
 
     .LINK
@@ -104,7 +104,7 @@ function Get-MacmonReport
     $params.Add('Uri', ('{0}/{1}{2}' -f $BaseURL, $ID, $FunctionString))
     if ($Path)
     {
-      $params.Add('OutFile', ('{0}{1}.{2}' -f $Path, $ID, $Format))
+      $params.Add('OutFile', ('{0}\{1}.{2}' -f $Path, $ID, $Format))
       Invoke-MacmonRestMethod @Params
     }
     else
