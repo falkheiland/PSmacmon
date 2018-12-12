@@ -59,7 +59,7 @@ function Get-MacmonNetworkSegment
     $Credential = (Get-Credential -Message 'Enter your credentials'),
 
     [Parameter(ValueFromPipeline, ParameterSetName = 'ID')]
-    [int]
+    [string]
     $ID,
 
     [string]
@@ -111,6 +111,7 @@ function Get-MacmonNetworkSegment
       }
       'ID'
       {
+        $ID = $ID -replace '/', '%2F'
         $params.Add('Uri', ('{0}/{1}{2}' -f $BaseURL, $ID, $FunctionString))
         Invoke-MacmonRestMethod @Params
       }
