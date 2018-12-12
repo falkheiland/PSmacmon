@@ -22,7 +22,7 @@ Get-MacmonNetworkSegment -HostName <String> [-TCPPort <Int32>] [-ApiVersion <Str
 ### ID
 ```
 Get-MacmonNetworkSegment -HostName <String> [-TCPPort <Int32>] [-ApiVersion <String>]
- [-Credential <PSCredential>] [-ID <Int32>] [-Fields <String>] [<CommonParameters>]
+ [-Credential <PSCredential>] [-ID <String>] [-Fields <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -68,6 +68,24 @@ broadcastAddress networkAddress subnetMask
 192.168.80.255   192.168.80.0   255.255.255.0
 ```
 Get networkAddress subnetMask and broadcastAddress of network segment with ID '192.168.80.0/255.255.255.0'.
+
+### Example 3
+```powershell
+$Params = @{
+  Hostname   = 'MACMONSERVER'
+  Credential = Get-Credential
+}
+"192.168.80.0/255.255.255.0" | Get-MacmonNetworkSegment @Params
+```
+```
+id               : 192.168.80.0/255.255.255.0
+comment          :
+broadcastAddress : 192.168.80.255
+created          :
+networkAddress   : 192.168.80.0
+subnetMask       : 255.255.255.0
+```
+Get network segment with ID '192.168.80.0/255.255.255.0'.
 
 ## PARAMETERS
 
@@ -135,7 +153,7 @@ Accept wildcard characters: False
 ID of the network segment ('192.168.80.0/255.255.255.0')
 
 ```yaml
-Type: Int32
+Type: String
 Parameter Sets: ID
 Aliases:
 
