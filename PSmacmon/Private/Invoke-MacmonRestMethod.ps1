@@ -28,6 +28,9 @@ function Invoke-MacmonRestMethod
     [string]
     $Body,
 
+    [string]
+    $OutFile,
+
     [Parameter(Mandatory)]
     [ValidateSet('Get', 'Post', 'Delete', 'Patch', 'Put')]
     [string]

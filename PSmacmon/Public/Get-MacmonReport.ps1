@@ -36,6 +36,8 @@ function Get-MacmonReport
 
     .EXAMPLE
     'unauthorisedMacs' | Get-MacmonReport -Hostname 'MACMONSERVER' -Format 'csv' -Path 'C:\Temp\'
+    'unauthorisedMacs' | Get-MacmonReport -Hostname 'MACMONSERVER' -Format 'pdf' -Path 'C:\Temp\'
+    'unauthorisedMacs' | Get-MacmonReport -Hostname 'MACMONSERVER' -Format 'xlsx' -Path 'C:\Temp\'
     #Get result of report with ReportID 'unauthorisedMacs' as file to 'C:\Temp\unauthorisedMacs.csv'
 
     .LINK
@@ -69,8 +71,7 @@ function Get-MacmonReport
     [string]
     $ID,
 
-    #[ValidateSet('csv', 'pdf', 'xlsx')] #'pdf' and 'xlsx' does not work atm
-    [ValidateSet('csv')]
+    [ValidateSet('csv', 'pdf', 'xlsx')]
     [string]
     $Format = 'csv',
 
@@ -101,14 +102,14 @@ function Get-MacmonReport
   process
   {
     $params.Add('Uri', ('{0}/{1}{2}' -f $BaseURL, $ID, $FunctionString))
-    $Result = Invoke-MacmonRestMethod @Params
     if ($Path)
     {
-      $Result | Out-File -FilePath ('{0}{1}.{2}' -f $Path, $ID, $Format)
+      $params.Add('OutFile', ('{0}{1}.{2}' -f $Path, $ID, $Format))
+      Invoke-MacmonRestMethod @Params
     }
     else
     {
-      ConvertFrom-Csv -InputObject $Result -Delimiter ';'
+      Invoke-MacmonRestMethod @Params | ConvertFrom-Csv -Delimiter ';'
     }
   }
   end
