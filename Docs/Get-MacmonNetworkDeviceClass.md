@@ -1,7 +1,7 @@
 ---
 external help file: PSmacmon-help.xml
 Module Name: PSmacmon
-online version: https://github.com/falkheiland/PSmacmon
+online version: https://github.com/falkheiland/PSmacmon/blob/master/Docs/Get-MacmonNetworkDeviceClass.md
 schema: 2.0.0
 ---
 
@@ -30,27 +30,61 @@ Get Network Device Classes from the macmon NAC via RESTAPI.
 
 ## EXAMPLES
 
-### BEISPIEL 1
+### Example 1
+```powershell
+$Params = @{
+  Hostname   = 'MACMONSERVER'
+  Credential = Get-Credential
+}
+Get-MacmonNetworkDeviceClass @Params
 ```
-$Credential = Get-Credential -Message 'Enter your credentials'
+```
+id                      : 1
+description             : Template for all new classes
+custom                  : CUSTOM_ORIGINAL
+classifierType          : SysObjectIdClassifier
+classifierValue         :
+networkDeviceCategoryId :
+networkDeviceCategory   :
+methods                 : @{MacAddressesReadJob=; InterfaceManagementJob=; TopologyReadJob=; InterfacesReadJob=; Dot1xReadJob=; ArpReadJob=; VlanReadJob=;
+                          InterfaceStatusReadJob=}
+name                    : _ Default Template Class
+
+id                      : 2
+description             : DNS per Zoneload
+custom                  : CUSTOM_NOT_IN_XML
+classifierType          : ManualClassifier
+classifierValue         : DNS Zoneload
+networkDeviceCategoryId :
+networkDeviceCategory   :
+methods                 : @{DhcpReadJob=}
+name                    : DNS Zoneload
+```
+Get all Network Device Classes (excerpt).
+
+### Example 2
+```powershell
+$Params = @{
+  Hostname   = 'MACMONSERVER'
+  Credential = Get-Credential
+  Filter     = 'custom=="CUSTOM_ORIGINAL"'
+  Fields     = 'name,classifierValue'
+  Sort       = 'name,classifierValue'
+}
+(Get-MacmonNetworkDeviceClass @Params).where{$_.name -match '^HP ProCurve.*'} |
+Select-Object -First 5
+```
+```
+classifierValue                  name
+---------------                  ----
+1.3.6.1.4.1.11.2.3.7.11.33.1.1.1 HP ProCurve Blade Switch
+1.3.6.1.4.1.11.2.3.7.11.131      HP ProCurve E2620-24-PPoE+ Switch
+1.3.6.1.4.1.11.2.3.7.11.113      HP ProCurve E8206zl Switch
+1.3.6.1.4.1.11.2.3.7.11.129      HP ProCurve Switch  E2620-24
+1.3.6.1.4.1.11.2.3.7.11.75       HP ProCurve Switch 1700-24
 ```
 
-Get-MacmonNetworkDeviceClass -Hostname 'MACMONSERVER' -Credential $Credential
-#Ask for credential then get Network Device Classes from macmon NAC using provided credential
-
-### BEISPIEL 2
-```
-760 | Get-MacmonNetworkDeviceClass -Hostname 'MACMONSERVER'
-```
-
-#Get Network Device Classes with ID 760
-
-### BEISPIEL 3
-```
-(Get-MacmonNetworkDeviceClass -Hostname 'MACMONSERVER').where{$_.description -match '^Template.*'}
-```
-
-#Get Network Device Classes with description starting with 'Template'
+Get classifierValue and name of the first 5 original Network Device Classes for 'HP ProCurve' devices sorted for name than classifierValue.
 
 ## PARAMETERS
 
@@ -218,5 +252,5 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 [https://github.com/falkheiland/PSmacmon](https://github.com/falkheiland/PSmacmon)
 
-[https://<MACMONSERVER>/man/index.php?controller=ApiDocuController]()
+[https://MACMONSERVER/man/index.php?controller=ApiDocuController](https://MACMONSERVER/man/index.php?controller=ApiDocuController)
 

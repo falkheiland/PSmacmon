@@ -1,7 +1,7 @@
 ---
 external help file: PSmacmon-help.xml
 Module Name: PSmacmon
-online version: https://github.com/falkheiland/PSmacmon
+online version: https://github.com/falkheiland/PSmacmon/blob/master/Docs/Get-MacmonEndpointGroup.md
 schema: 2.0.0
 ---
 
@@ -30,29 +30,99 @@ Get Endpoint Group from the macmon NAC via RESTAPI.
 
 ## EXAMPLES
 
-### BEISPIEL 1
+### Example 1
+```powershell
+$Params = @{
+  Hostname   = 'MACMONSERVER'
+  Credential = Get-Credential
+}
+Get-MacmonEndpointGroup @Params
 ```
-$Credential = Get-Credential -Message 'Enter your credentials'
 ```
+id                        : 150
+description               :
+endpointGroupProperties   : {}
+userValues                :
+credentials               : {}
+advancedSecurityProtocols : {}
+authorizedVlansLow        : {6}
+authorizedVlansMedium     : {}
+authorizedVlansHigh       : {}
+consumptionOn             : 0,0
+consumptionOff            : 0,0
+scanServicesActive        : False
+obsoleteEndpointExpire    : 15552000000
+macStatisticActive        : True
+permissionLow             : 1
+permissionMedium          : 3
+permissionHigh            : 3
+macValidity               :
+credentialIds             : {}
+portRequirements          : {}
+name                      : Group1
+properties                :
 
-Get-MacmonEndpointGroup -Hostname 'MACMONSERVER' -Credential $Credential
-#Ask for credential then get Endpoint Group from macmon NAC using provided credential
-
-### BEISPIEL 2
+id                        : 151
+description               :
+endpointGroupProperties   : {}
+userValues                :
+credentials               : {}
+advancedSecurityProtocols : {}
+authorizedVlansLow        : {68}
+authorizedVlansMedium     : {}
+authorizedVlansHigh       : {}
+consumptionOn             : 0,0
+consumptionOff            : 0,0
+scanServicesActive        : False
+obsoleteEndpointExpire    : 15552000000
+macStatisticActive        : True
+permissionLow             : 1
+permissionMedium          : 3
+permissionHigh            : 3
+macValidity               :
+credentialIds             : {}
+portRequirements          : {}
+name                      : Group2
+properties                :
 ```
-0 | Get-MacmonEndpointGroup -Hostname 'MACMONSERVER' | Select-Object -Property name, description
-```
+Ask for credential then get Endpoint Group.
 
-#Get name and description from Endpoint Group with ID 0
-
-### BEISPIEL 3
+### Example 2
+```powershell
+$Params = @{
+  Hostname   = 'MACMONSERVER'
+  Credential = Get-Credential
+  Fields     = 'name,description'
+  Filter     = 'id==0'
+}
+Get-MacmonEndpointGroup @Params
 ```
-(Get-MacmonEndpointGroup -Hostname 'MACMONSERVER').where{$_.obsoleteEndpointExpire} |
 ```
+description name
+----------- ----
+Other       Default
+```
+Get name and description from Endpoint Group with ID 0.
 
-Select-Object -Property name, obsoleteEndpointExpire |
-  Sort-Object obsoleteEndpointExpire, name
-#Get name and obsoleteEndpointExpire from Endpoint Group with obsoleteEndpointExpire, sorted by obsoleteEndpointExpire and name
+### Example 3
+```powershell
+$Params = @{
+  Hostname   = 'MACMONSERVER'
+  Credential = Get-Credential
+  Fields     = 'name,obsoleteEndpointExpire'
+  Sort       = 'obsoleteEndpointExpire,name'
+}
+(Get-MacmonEndpointGroup @Params).where{$_.obsoleteEndpointExpire}
+```
+```
+obsoleteEndpointExpire name
+---------------------- ----
+            1209600000 Group7
+            1209600000 Group8
+           15552000000 Group1
+           15552000000 Group3
+```
+Get name and obsoleteEndpointExpire from Endpoint Group with obsoleteEndpointExpire set, sorted by obsoleteEndpointExpire and name.
 
 ## PARAMETERS
 
@@ -220,5 +290,5 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 [https://github.com/falkheiland/PSmacmon](https://github.com/falkheiland/PSmacmon)
 
-[https://<MACMONSERVER>/man/index.php?controller=ApiDocuController]()
+[https://MACMONSERVER/man/index.php?controller=ApiDocuController](https://MACMONSERVER/man/index.php?controller=ApiDocuController)
 

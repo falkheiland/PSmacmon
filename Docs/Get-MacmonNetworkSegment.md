@@ -1,7 +1,7 @@
 ---
 external help file: PSmacmon-help.xml
 Module Name: PSmacmon
-online version: https://github.com/falkheiland/PSmacmon
+online version: https://github.com/falkheiland/PSmacmon/blob/master/Docs/Get-MacmonNetworkSegment.md
 schema: 2.0.0
 ---
 
@@ -30,20 +30,44 @@ Get network segment from the macmon NAC via RESTAPI.
 
 ## EXAMPLES
 
-### BEISPIEL 1
-```
+### Example 1
+```powershell
 $Credential = Get-Credential -Message 'Enter your credentials'
-```
-
 Get-MacmonNetworkSegment -Hostname 'MACMONSERVER' -Credential $Credential
-#Ask for credential then get network segments from macmon NAC using provided credential
-
-### BEISPIEL 2
 ```
-'192.168.80.0/255.255.255.0' | Get-MacmonNetworkSegment -Hostname 'MACMONSERVER'
 ```
+id               : 1.1.1.0/255.255.255.0
+comment          :
+broadcastAddress : 1.1.1.255
+created          :
+networkAddress   : 1.1.1.0
+subnetMask       : 255.255.255.0
 
-#known bug: Get network segment with ID '192.168.80.0/255.255.255.0'
+id               : 10.3.1.0/255.255.255.0
+comment          :
+broadcastAddress : 10.3.1.255
+created          :
+networkAddress   : 10.3.1.0
+subnetMask       : 255.255.255.0
+```
+Get all network segments (excerpt).
+
+### Example 2
+```powershell
+$Params = @{
+  Hostname   = 'MACMONSERVER'
+  Credential = Get-Credential
+  Filter     = 'id=="192.168.80.0/255.255.255.0"'
+  Fields     = 'networkAddress,subnetMask,broadcastAddress'
+}
+Get-MacmonNetworkSegment @Params
+```
+```
+broadcastAddress networkAddress subnetMask
+---------------- -------------- ----------
+192.168.80.255   192.168.80.0   255.255.255.0
+```
+Get networkAddress subnetMask and broadcastAddress of network segment with ID '192.168.80.0/255.255.255.0'.
 
 ## PARAMETERS
 
@@ -211,5 +235,5 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 [https://github.com/falkheiland/PSmacmon](https://github.com/falkheiland/PSmacmon)
 
-[https://<MACMONSERVER>/man/index.php?controller=ApiDocuController]()
+[https://MACMONSERVER/man/index.php?controller=ApiDocuController](https://MACMONSERVER/man/index.php?controller=ApiDocuController)
 

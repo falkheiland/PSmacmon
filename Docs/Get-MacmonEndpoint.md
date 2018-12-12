@@ -1,7 +1,7 @@
 ---
 external help file: PSmacmon-help.xml
 Module Name: PSmacmon
-online version: https://github.com/falkheiland/PSmacmon
+online version: https://github.com/falkheiland/PSmacmon/blob/master/Docs/Get-MacmonEndpoint.md
 schema: 2.0.0
 ---
 
@@ -29,20 +29,57 @@ Get Endpoint from the macmon NAC via RESTAPI.
 
 ## EXAMPLES
 
-### BEISPIEL 1
-```
-$Credential = Get-Credential -Message 'Enter your credentials'
-```
-
-Get-MacmonEndpoint -Hostname 'MACMONSERVER' -Credential $Credential
-#Ask for credential then get Endpoint from macmon NAC using provided credential
-
-### BEISPIEL 2
-```
+### Example 1
+```powershell
 $Params = @{
+  Hostname   = 'MACMONSERVER'
+  Credential = Get-Credential
+}
+Get-MacmonEndpoint @Params
 ```
+```
+mac                  : 00-19-99-B4-2C-06
+type                 : CORPORATE
+comment              :
+wakeupTime           :
+active               : True
+identityStoreId      : -1
+staticIps            : {}
+userValues           :
+endpointGroup        :
+inventory            :
+created              : 2018-12-05T09:59:15.918Z
+identity             : 00-19-99-B4-2C-06
+lastChangeTime       : 2018-12-05T09:59:15.918Z
+expireTime           :
+authorizedVlans      : {}
+endpointGroupId      : 120
+endpointDeviceStatus :
 
-Hostname = 'MACMONSERVER'
+mac                  : 00-19-99-B1-3C-15
+type                 : CORPORATE
+comment              :
+wakeupTime           :
+active               : True
+identityStoreId      : -1
+staticIps            : {}
+userValues           :
+endpointGroup        :
+inventory            :
+created              : 2018-12-05T09:59:15.918Z
+identity             : PC012345.acme.org
+lastChangeTime       : 2018-12-05T09:59:15.918Z
+expireTime           :
+authorizedVlans      : {}
+endpointGroupId      : 102
+endpointDeviceStatus :
+```
+Get all endpoints (excerpt).
+
+### Example 2
+```powershell
+$Params = @{
+  Hostname = 'MACMONSERVER'
   Fields   = 'mac,endpointDeviceStatus.lastIp'
   Sort     = '-mac'
   Limit    = 1
@@ -50,21 +87,38 @@ Hostname = 'MACMONSERVER'
   Filter   = 'endpointGroupId==150'
 }
 Get-MacmonEndpoint @Params
-Get mac and lastIP address from 11th endpoint from endpointgroup with ID 150 sorted by mac descending
-
-### BEISPIEL 3
 ```
+```
+mac               endpointDeviceStatus
+---               --------------------
+F0-92-1C-64-C5-8F @{lastIp=192.168.6.17}
+```
+Get mac and lastIP address from 11th endpoint from endpointgroup with ID 150 sorted by mac descending.
+
+### Example 3
+```powershell
 '00-00-FF-FF-FF-FF' | Get-MacmonEndpoint -Hostname 'MACMONSERVER'
 ```
-
-#Get Endpoint with MACAddress '00-00-FF-FF-FF-FF'
-
-### BEISPIEL 4
 ```
-(Get-MacmonEndpoint -Hostname 'MACMONSERVER').where{$_.endpointGroupId -eq 150}
+mac                  : 00-00-FF-FF-FF-FF
+type                 : CORPORATE
+comment              :
+wakeupTime           :
+active               : False
+identityStoreId      : -1
+staticIps            : {}
+userValues           :
+endpointGroup        :
+inventory            :
+created              : 2018-12-05T09:59:15.917Z
+identity             : 00-00-FF-FF-FF-FF
+lastChangeTime       : 2018-12-05T09:59:15.917Z
+expireTime           :
+authorizedVlans      : {}
+endpointGroupId      : 10
+endpointDeviceStatus :
 ```
-
-#Get Endpoint with endpointGroupId 10
+Get Endpoint with MACAddress '00-00-FF-FF-FF-FF'.
 
 ## PARAMETERS
 
@@ -232,5 +286,5 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 [https://github.com/falkheiland/PSmacmon](https://github.com/falkheiland/PSmacmon)
 
-[https://<MACMONSERVER>/man/index.php?controller=ApiDocuController]()
+[https://MACMONSERVER/man/index.php?controller=ApiDocuController](https://MACMONSERVER/man/index.php?controller=ApiDocuController)
 

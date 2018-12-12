@@ -1,7 +1,7 @@
 ---
 external help file: PSmacmon-help.xml
 Module Name: PSmacmon
-online version: https://github.com/falkheiland/PSmacmon
+online version: https://github.com/falkheiland/PSmacmon/blob/master/Docs/Get-MacmonNetworkDevice.md
 schema: 2.0.0
 ---
 
@@ -30,27 +30,84 @@ Get network device from the macmon NAC via RESTAPI.
 
 ## EXAMPLES
 
-### BEISPIEL 1
+### Example 1
+```powershell
+$Params = @{
+  Hostname   = 'MACMONSERVER'
+  Credential = Get-Credential
+}
+Get-MacmonNetworkDevice @Params
 ```
-$Credential = Get-Credential -Message 'Enter your credentials'
 ```
+id                    : 1
+interfaces            : @{1=; 2=; 3=; 4=; 5=}
+active                : True
+enabledProtocols      : {snmpv3, snmpv2c, snmpv1, radius...}
+location              :
+description           : macmon Server
+address               : localhost
+ignoreHardwareChanges : True
+webInterfaceUrl       :
+userValues            :
+credentials           : {}
+vlans                 :
+credentialIds         : {}
+interfaceStatistic    : False
+nac                   : True
+networkDeviceClassId  : 339
+networkDeviceClass    :
+networkDeviceGroupId  : 5
+networkDeviceGroup    :
+dhcpEndpointGroupId   :
+dhcpEndpointGroup     :
+networkDeviceStatus   :
 
-Get-MacmonNetworkDevice -Hostname 'MACMONSERVER' -Credential $Credential
-#Ask for credential then get network device from macmon NAC using provided credential
-
-### BEISPIEL 2
+id                    : 2
+interfaces            : @{22=; 23=; 24=; 2098=; 172=; 174=; 4192=; 136=; 97=; 10=; 11=; 12=; 13=; 14=; 15=; 16=; 17=; 18=; 19=; 1=; 2=; 3=; 201=; 146=; 2115=; 4=; 5=; 126=;
+                        6=; 127=; 7=; 8=; 129=; 9=; 20=; 21=; 1207=}
+active                : True
+enabledProtocols      : {snmpv3, snmpv2c, snmpv1, radius...}
+location              : location1
+description           : Switch location1
+address               : 192.168.3.51
+ignoreHardwareChanges : False
+webInterfaceUrl       : https://192.168.3.51
+userValues            :
+credentials           : {}
+vlans                 : @{1=; 3=; 55=}
+credentialIds         : {}
+interfaceStatistic    : True
+nac                   : True
+networkDeviceClassId  : 63
+networkDeviceClass    :
+networkDeviceGroupId  : 14
+networkDeviceGroup    :
+dhcpEndpointGroupId   :
+dhcpEndpointGroup     :
+networkDeviceStatus   :
 ```
-60 | Get-MacmonNetworkDevice -Hostname 'MACMONSERVER'
-```
+Get all network devices.
 
-#Get network device with ID 60
-
-### BEISPIEL 3
+### Example 2
+```powershell
+$Params = @{
+  Hostname   = 'MACMONSERVER'
+  Credential = Get-Credential
+  Filter     = 'networkDeviceGroupId==14'
+  Fields     = 'address,description'
+  Sort       = 'description'
+  Limit      = 3
+}
+Get-MacmonNetworkDevice @Params
 ```
-((Get-MacmonNetworkDevice -Hostname 'MACMONSERVER').where{$_.networkDeviceGroupId -eq 14}).description
 ```
-
-#Get description of all network devices with networkDeviceGroupId 14
+description address
+----------- -------
+Switch1     192.168.3.1
+Switch2     10.1.3.254
+Switch3     192.168.3.5
+```
+Get address and description of first 3 network devices, sorted by description, from networkDeviceGroupId 14.
 
 ## PARAMETERS
 
@@ -218,5 +275,5 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 [https://github.com/falkheiland/PSmacmon](https://github.com/falkheiland/PSmacmon)
 
-[https://<MACMONSERVER>/man/index.php?controller=ApiDocuController]()
+[https://MACMONSERVER/man/index.php?controller=ApiDocuController](https://MACMONSERVER/man/index.php?controller=ApiDocuController)
 

@@ -1,7 +1,7 @@
 ---
 external help file: PSmacmon-help.xml
 Module Name: PSmacmon
-online version: https://github.com/falkheiland/PSmacmon
+online version: https://github.com/falkheiland/PSmacmon/blob/master/Docs/Get-MacmonLicenseOption.md
 schema: 2.0.0
 ---
 
@@ -30,20 +30,59 @@ Get License Option from the macmon NAC via RESTAPI.
 
 ## EXAMPLES
 
-### BEISPIEL 1
-```
+### Example 1
+```powershell
 $Credential = Get-Credential -Message 'Enter your credentials'
-```
-
 Get-MacmonLicenseOption -Hostname 'MACMONSERVER' -Credential $Credential
-#Ask for credential then get license options from macmon NAC using provided credential
-
-### BEISPIEL 2
 ```
-'TOPOLOGY' | Get-MacmonLicenseOption -Hostname 'MACMONSERVER' | Select-Object -Property name, description
 ```
+name           : 802.1X
+expiration     :
+licenseFile    :
+limits         : {}
+disabledReason :
+properties     : {}
 
-#Get name and description from license option with Name 'TOPOLOGY'
+name           : ADVANCED_SECURITY
+expiration     :
+licenseFile    :
+limits         : {}
+disabledReason :
+properties     : {}
+```
+Get all license options.
+
+### Example 2
+```powershell
+$Params = @{
+  Hostname   = 'MACMONSERVER'
+  Credential = Get-Credential
+  Fields     = 'name,limits.name.maclimit,limits.limit.maclimit,limits.current.maclimit'
+  Filter     = 'name==OBSERVER'
+}
+$LicenseColl = Get-MacmonLicenseOption @Params
+$LicenseOptionColl = foreach ($License in $LicenseColl)
+{
+  foreach ($LicenseLimit in $License.limits)
+  {
+    [pscustomobject]@{
+      license      = $License.name
+      limitname    = $LicenseLimit.name
+      limitmax     = $LicenseLimit.limit
+      limitcurrent = $LicenseLimit.current
+    }
+  }
+}
+$LicenseOptionColl
+```
+```
+license  limitname   limitmax limitcurrent
+-------  ---------   -------- ------------
+OBSERVER maclimit        1500         1318
+OBSERVER devicelimit                   116
+OBSERVER guestlimit      2400            0
+```
+Create Object from license options for 'OBSERVER'-license.
 
 ## PARAMETERS
 
@@ -211,5 +250,5 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 [https://github.com/falkheiland/PSmacmon](https://github.com/falkheiland/PSmacmon)
 
-[https://<MACMONSERVER>/man/index.php?controller=ApiDocuController]()
+[https://MACMONSERVER/man/index.php?controller=ApiDocuController](https://MACMONSERVER/man/index.php?controller=ApiDocuController)
 

@@ -1,7 +1,7 @@
 ---
 external help file: PSmacmon-help.xml
 Module Name: PSmacmon
-online version: https://github.com/falkheiland/PSmacmon
+online version: https://github.com/falkheiland/PSmacmon/blob/master/Docs/Get-MacmonNetworkDeviceGroup.md
 schema: 2.0.0
 ---
 
@@ -30,27 +30,59 @@ Get Network Device Group from the macmon NAC via RESTAPI.
 
 ## EXAMPLES
 
-### BEISPIEL 1
+### Example 1
+```powershell
+$Params = @{
+  Hostname   = 'MACMONSERVER'
+  Credential = Get-Credential
+}
+Get-MacmonNetworkDeviceGroup @Params
 ```
-$Credential = Get-Credential -Message 'Enter your credentials'
 ```
+id                         : 1
+description                : MACs, ARP
+fullName                   : Access-Point
+userValues                 :
+credentials                : {}
+credentialIds              : {}
+scanActions                : @{GetInterfacesAction=; GetMACsAction=}
+style                      :
+parentNetworkDeviceGroupId :
+parentNetworkDeviceGroup   :
+name                       : Access-Point
 
-Get-MacmonNetworkDeviceGroup -Hostname 'MACMONSERVER' -Credential $Credential
-#Ask for credential then get Network Device Groups from macmon NAC using provided credential
-
-### BEISPIEL 2
+id                         : 2
+description                : DHCP
+fullName                   : DHCP-Server
+userValues                 :
+credentials                : {}
+credentialIds              : {}
+scanActions                : @{GetDHCPAction=}
+style                      :
+parentNetworkDeviceGroupId :
+parentNetworkDeviceGroup   :
+name                       : DHCP-Server
 ```
-20 | Get-MacmonNetworkDeviceGroup -Hostname 'MACMONSERVER'
-```
+Get all Network Device Groups (excerpt).
 
-#Get Network Device Group with ID 20
-
-### BEISPIEL 3
+### Example 2
+```powershell
+$Params = @{
+  Hostname   = 'MACMONSERVER'
+  Credential = Get-Credential
+  Fields     = 'id,name'
+  Sort       = 'name'
+}
+(Get-MacmonNetworkDeviceGroup @Params).where{$_.name -match 'SonicWALL.*'}
 ```
-(Get-MacmonNetworkDeviceGroup -Hostname 'MACMONSERVER').where{$_.name -match 'SonicWALL.*'}
 ```
-
-#Get Network Device Groups with name containing with 'SonicWALL'
+id name
+-- ----
+19 SonicWALL E6500
+17 SonicWALL NSA 240
+16 SonicWALL NSA6600
+```
+Get id and name of Network Device Groups with name containing with 'SonicWALL', sorted by name.
 
 ## PARAMETERS
 
@@ -218,5 +250,5 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 [https://github.com/falkheiland/PSmacmon](https://github.com/falkheiland/PSmacmon)
 
-[https://<MACMONSERVER>/man/index.php?controller=ApiDocuController]()
+[https://MACMONSERVER/man/index.php?controller=ApiDocuController](https://MACMONSERVER/man/index.php?controller=ApiDocuController)
 
