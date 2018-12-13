@@ -1,7 +1,7 @@
 ---
 external help file: PSmacmon-help.xml
 Module Name: PSmacmon
-online version: https://github.com/falkheiland/PSmacmon
+online version: https://github.com/falkheiland/PSmacmon/blob/master/Docs/Update-MacmonEndpointProperty.md
 schema: 2.0.0
 ---
 
@@ -25,30 +25,38 @@ Not all properties configurable per RESTAPI are available in this function.
 
 ## EXAMPLES
 
-### BEISPIEL 1
-```
-$Credential = Get-Credential -Message 'Enter your credentials'
-```
-
-Update-MacmonEndpointProperty -Hostname 'MACMONSERVER' -Credential $Credential -MACAddress '8C-73-6E-0B-33-6E' -Comment 'New Comment'
-#Ask for credential then update comment of endpoint with MACAddress '8C-73-6E-0B-33-6E'
-
-### BEISPIEL 2
-```
-$Properties = @{
-```
-
-Hostname               = 'MACMONSERVER'
-  MACAddress             = '8C-73-6E-0B-33-6E'
-  Comment                = 'New Comment'
-  Active                 = 'False'
-  IPAddress              = '192.168.1.1', '10.10.10.11'
-  Inventory              = '012345'
-  AuthorizedVlans       = '10', '20', '30' #API bug
-  EndpointGroupId        = 11
+### Example 1
+```powershell
+$Params = @{
+  Hostname   = 'MACMONSERVER'
+  MACAddress = '00-11-22-33-44-55'
+  Comment    = 'New Comment'
 }
-Update-MacmonEndpointProperty @Properties
-#update endpoint with MACAddress '8C-73-6E-0B-33-6E' (all provided properties)
+Update-MacmonEndpointProperty @Params
+```
+```
+#no output
+```
+Update comment of endpoint with MACAddress '00-11-22-33-44-55'.
+
+### Example 2
+```powershell
+$Params = @{
+  Hostname        = 'MACMONSERVER'
+  MACAddress      = '00-11-22-33-44-55'
+  Comment         = 'New Comment'
+  Active          = 'False'
+  IPAddress       = '192.168.1.1', '10.10.10.11'
+  Inventory       = '012345'
+  AuthorizedVlans = '10', '20', '30'
+  EndpointGroupId = 11
+}
+Update-MacmonEndpointProperty @Params
+```
+```
+#no output
+```
+Update endpoint with MACAddress '00-11-22-33-44-55' (all provided properties).
 
 ## PARAMETERS
 
@@ -264,5 +272,6 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 [https://github.com/falkheiland/PSmacmon](https://github.com/falkheiland/PSmacmon)
 
-[https://<MACMONSERVER>/man/index.php?controller=ApiDocuController]()
+[https://MACMONSERVER/man/index.php?controller=ApiDocuController](https://MACMONSERVER/man/index.php?controller=ApiDocuController)
+
 

@@ -1,7 +1,7 @@
 ---
 external help file: PSmacmon-help.xml
 Module Name: PSmacmon
-online version: https://github.com/falkheiland/PSmacmon
+online version: https://github.com/falkheiland/PSmacmon/blob/master/Docs/Get-MacmonSetting.md
 schema: 2.0.0
 ---
 
@@ -29,20 +29,49 @@ Get Settings from the macmon NAC via RESTAPI.
 
 ## EXAMPLES
 
-### BEISPIEL 1
-```
+### Example 1
+```powershell
 $Credential = Get-Credential -Message 'Enter your credentials'
-```
-
 Get-MacmonSetting -Hostname 'MACMONSERVER' -Credential $Credential
-#Ask for credential then get Settingss from macmon NAC using provided credential
-
-### BEISPIEL 2
 ```
-'engine.endpoint_expire_action' | Get-MacmonSetting -Hostname 'MACMONSERVER'
 ```
+id                                                  value
+--                                                  -----
+advanced_security.enabled                           1
+advanced_security.learn_on_match
+advanced_security.scan_delay                        2
+advanced_security.scan_interval                     30
+advanced_security.thread_pool_size                  50
+advanced_security.unauthorized_endpoint_group
+...
+ui.permanent_login                                  1
+ui.session_expire_time                              60
+ui.userlink1
+ui.userlink2
+ui.userlinktitle1
+ui.userlinktitle2
+```
+Get all Settings (excerpt).
 
-#Get Settings with ID 'engine.endpoint_expire_action'
+### Example 2
+```powershell
+$Params = @{
+  Hostname   = 'MACMONSERVER'
+  Credential = Get-Credential
+}
+(Get-MacmonSetting @Params).where{
+  $_.id -match '^commands.wakeonlan.*'
+}
+
+```
+```
+id                             value
+--                             -----
+commands.wakeonlan_method      Directed Broadcast
+commands.wakeonlan_port        9
+commands.wakeonlan_repetitions 3
+```
+Get all settings related to WOL.
 
 ## PARAMETERS
 
@@ -122,7 +151,7 @@ Accept wildcard characters: False
 ```
 
 ### -Fields
-{{Fill Fields Description}}
+Select string (e.g. 'address,networkDeviceGroupId')
 
 ```yaml
 Type: String
@@ -137,7 +166,7 @@ Accept wildcard characters: False
 ```
 
 ### -Sort
-{{Fill Sort Description}}
+Sort string (e.g. 'active,address')
 
 ```yaml
 Type: String
@@ -152,7 +181,7 @@ Accept wildcard characters: False
 ```
 
 ### -Limit
-{{Fill Limit Description}}
+Limit int (e.g. 10)
 
 ```yaml
 Type: Int32
@@ -167,7 +196,7 @@ Accept wildcard characters: False
 ```
 
 ### -Offset
-{{Fill Offset Description}}
+Offset int (e.g. 10)
 
 ```yaml
 Type: Int32
@@ -182,7 +211,7 @@ Accept wildcard characters: False
 ```
 
 ### -Filter
-{{Fill Filter Description}}
+Filter string (e.g. '(id >=4 and id <= 10) and active == true and nac != true')
 
 ```yaml
 Type: String
@@ -210,5 +239,5 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 [https://github.com/falkheiland/PSmacmon](https://github.com/falkheiland/PSmacmon)
 
-[https://<MACMONSERVER>/man/index.php?controller=ApiDocuController]()
+[https://MACMONSERVER/man/index.php?controller=ApiDocuController](https://MACMONSERVER/man/index.php?controller=ApiDocuController)
 

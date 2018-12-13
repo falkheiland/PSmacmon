@@ -1,7 +1,7 @@
 ---
 external help file: PSmacmon-help.xml
 Module Name: PSmacmon
-online version: https://github.com/falkheiland/PSmacmon
+online version: https://github.com/falkheiland/PSmacmon/blob/master/Docs/New-MacmonEndpoint.md
 schema: 2.0.0
 ---
 
@@ -21,34 +21,42 @@ New-MacmonEndpoint [-HostName] <String> [[-TCPPort] <Int32>] [[-ApiVersion] <Str
 
 ## DESCRIPTION
 Create Endpoint from the macmon NAC via RESTAPI.
-Not all properties configurable per RESTAPI are available in this function.
 
 ## EXAMPLES
 
-### BEISPIEL 1
-```
-$Credential = Get-Credential -Message 'Enter your credentials'
-```
-
-New-MacmonEndpoint -Hostname 'MACMONSERVER' -Credential $Credential -MACAddress '00-11-22-33-44-55'
-#Ask for credential then create new endpoint with MAC address '00-11-22-33-44-55' (minimum requirement)
-
-### BEISPIEL 2
-```
-$Properties = @{
-```
-
-Hostname        = 'MACMONSERVER'
-  mac             = '00-11-22-33-44-55'
-  comment         = 'new Enpoint-Device'
-  active          = $true
-  staticIps       = '192.168.3.1', '192.168.1.2'
-  inventory       = '012345'
-  authorizedVlans = '10', '11'
-  endpointGroupId = 0
+### Example 1
+```powershell
+$Params = @{
+  Hostname   = 'MACMONSERVER'
+  Credential = Get-Credential
+  MACAddress = '00-11-22-33-44-55'
 }
-New-MacmonEndpoint @Properties
-#Create new endpoint with all supported (by function) properties
+New-MacmonEndpoint @Params
+```
+```
+00-11-22-33-44-55
+```
+Create new endpoint with MAC address '00-11-22-33-44-55' (minimum requirement).
+
+### Example 2
+```powershell
+$Params = @{
+  Hostname        = 'MACMONSERVER'
+  Credential      = Get-Credential
+  MACAddress      = '00-11-22-33-44-55'
+  Comment         = 'new Enpoint-Device'
+  Active          = $true
+  IPAddress       = '192.168.3.1', '192.168.1.2'
+  Inventory       = '012345'
+  AuthorizedVlans = '10', '11'
+  EndpointGroupId = 0
+}
+New-MacmonEndpoint @Params
+```
+```
+00-11-22-33-44-55
+```
+Create new endpoint with all supported (by function) properties.
 
 ## PARAMETERS
 
@@ -264,5 +272,5 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 [https://github.com/falkheiland/PSmacmon](https://github.com/falkheiland/PSmacmon)
 
-[https://<MACMONSERVER>/man/index.php?controller=ApiDocuController]()
+[https://MACMONSERVER/man/index.php?controller=ApiDocuController](https://MACMONSERVER/man/index.php?controller=ApiDocuController)
 

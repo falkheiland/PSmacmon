@@ -1,7 +1,7 @@
 ---
 external help file: PSmacmon-help.xml
 Module Name: PSmacmon
-online version: https://github.com/falkheiland/PSmacmon
+online version: https://github.com/falkheiland/PSmacmon/blob/master/Docs/New-MacmonNetworkDevice.md
 schema: 2.0.0
 ---
 
@@ -27,35 +27,43 @@ Not all properties configurable per RESTAPI are available in this function.
 
 ## EXAMPLES
 
-### BEISPIEL 1
-```
-$Credential = Get-Credential -Message 'Enter your credentials'
-```
-
-New-MacmonNetworkDevice -Hostname 'MACMONSERVER' -Credential $Credential -Address '192.168.0.1'
-#Ask for credential then create new network device with address '192.168.0.1' (minimum requirement)
-
-### BEISPIEL 2
-```
-$Properties = @{
-```
-
-Hostname              = 'MACMONSERVER'
-  address               = '192.168.3.1'
-  active                = $true
-  nac                   = $false
-  ignoreHardwareChanges = $true
-  enabledProtocols      = ('snmpv3', 'snmpv2c')
-  interfaceStatistic    = $true
-  networkDeviceClassId  = 84
-  networkDeviceGroupId  = 14
-  description           = 'New Device'
-  location              = 'Cabinet 1'
-  webInterfaceUrl       = 'https://NewDevice.acme.com'
-  credentialIds         = 1, 2
+### Example 1
+```powershell
+$Params = @{
+  Hostname   = 'MACMONSERVER'
+  Credential = Get-Credential
+  Address    = '192.168.0.1'
 }
-New-MacmonNetworkDevice @Properties
-#Create new network device with all supported (by function) properties
+New-MacmonNetworkDevice @Params
+```
+```
+91
+```
+Create new network device with address '192.168.0.1' (minimum requirement).
+
+### Example 2
+```powershell
+$Params = @{
+  Hostname              = 'MACMONSERVER'
+  Address               = '192.168.0.1'
+  Active                = $true
+  Nac                   = $false
+  NetworkDeviceGroupId  = 14
+  NetworkDeviceClassId  = 84
+  Description           = 'New Device'
+  Location              = 'Cabinet1'
+  IgnoreHardwareChanges = $true
+  EnabledProtocols      = ('snmpv3', 'snmpv2c')
+  InterfaceStatistic    = $true
+  WebInterfaceUrl       = 'https://NewDevice.acme.com'
+  CredentialIds         = 1, 2
+}
+New-MacmonNetworkDevice @Params
+```
+```
+95
+```
+Create new network device with all supported (by function) properties.
 
 ## PARAMETERS
 
@@ -358,5 +366,5 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 [https://github.com/falkheiland/PSmacmon](https://github.com/falkheiland/PSmacmon)
 
-[https://<MACMONSERVER>/man/index.php?controller=ApiDocuController]()
+[https://MACMONSERVER/man/index.php?controller=ApiDocuController](https://MACMONSERVER/man/index.php?controller=ApiDocuController)
 

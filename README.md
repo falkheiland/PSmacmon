@@ -14,81 +14,63 @@ My goal is to support all API-functionalities. Suggestions are welcome.
 
 ## Functions
 
-### Get-MacmonCredential
+### [Get-MacmonCredential](Get-MacmonCredential.md)
+Get Credentials.
 
-Gets Credentials.
+### [Get-MacmonEndpoint](Get-MacmonEndpoint.md)
+Get Endpoint.
 
-### Get-MacmonEndpoint
+### [Get-MacmonEndpointGroup](Get-MacmonEndpointGroup.md)
+Get Endpoint Group.
 
-Gets Endpoints.
+### [Get-MacmonLicenseOption](Get-MacmonLicenseOption.md)
+Get License Option.
 
-### Get-MacmonEndpointGroup
+### [Get-MacmonNetworkDevice](Get-MacmonNetworkDevice.md)
+Get Network Device.
 
-Gets Endpoint Groups.
+### [Get-MacmonNetworkDeviceClass](Get-MacmonNetworkDeviceClass.md)
+Get Network Device Class.
 
-### Get-MacmonLicenseOption
+### [Get-MacmonNetworkDeviceGroup](Get-MacmonNetworkDeviceGroup.md)
+Get Network Device Group.
 
-Gets License Options.
+### [Get-MacmonNetworkSegment](Get-MacmonNetworkSegment.md)
+Get Network Segment.
 
-### Get-MacmonNetworkDevice
+### [Get-MacmonReport](Get-MacmonReport.md)
+Get result of report as object or as file.
 
-Gets Network Devices.
+### [Get-MacmonSetting](Get-MacmonSetting.md)
+Get Setting.
 
-### Get-MacmonNetworkDeviceClass
+### [Get-MacmonSystem](Get-MacmonSystem.md)
+Get System Info.
 
-Gets Network Device Classes.
+### [Get-MacmonUserProperty](Get-MacmonUserProperty.md)
+Get User Property.
 
-### Get-MacmonNetworkDeviceGroup
+### [Get-MacmonUserReport](Get-MacmonUserReport.md)
+Get User Report.
 
-Gets Network Device Groups.
+### [New-MacmonEndpoint](New-MacmonEndpoint.md)
+Create Endpoint.
 
-### Get-MacmonNetworkSegment
+### [New-MacmonEndpointGroup](New-MacmonEndpointGroup.md)
+Create Endpoint Group.
 
-Gets Network Segments.
+### [New-MacmonNetworkDevice](New-MacmonNetworkDevice.md)
+Create Network Device.
 
-### Get-MacmonReport
+### [Remove-MacmonEndpointProperty](Remove-MacmonEndpointProperty.md)
+Remove Endpoint Property.
 
-Gets Results of Reports.
+### [Update-MacmonEndpointGroupProperty](Update-MacmonEndpointGroupProperty.md)
+Update Endpoint Group Property.
 
-### Get-MacmonSetting
+### [Update-MacmonEndpointProperty](Update-MacmonEndpointProperty.md)
+Update Endpoint Property.
 
-Gets Settings.
-
-### Get-MacmonSystem
-
-Gets System Information.
-
-### Get-MacmonUserProperty
-
-Gets User Properties.
-
-### Get-MacmonUserReport
-
-Gets User Reports.
-
-### New-MacmonEndpoint
-
-Creates Endpoints.
-
-### New-MacmonEndpointGroup
-
-Creates Endpoint Groups.
-
-### New-MacmonNetworkDevice
-
-Creates Network Devices.
-
-### Remove-MacmonEndpointProperty
-
-Removes Endpoint Properties.
-
-### Update-MacmonEndpointGroupProperty
-
-Updates Endpoint Group Properties.
-
-### Update-MacmonEndpointProperty
-
-Updates Endpoint Properties.
 
 ## Private functions
 
@@ -99,3 +81,7 @@ Invoke-RestMethod Wrapper
 ### Invoke-MacmonTrustSelfSignedCertificate
 
 Trust self-signed certificates
+
+### Get-MacmonFunctionString
+
+Create function string

@@ -1,7 +1,7 @@
 ---
 external help file: PSmacmon-help.xml
 Module Name: PSmacmon
-online version: https://github.com/falkheiland/PSmacmon
+online version: https://github.com/falkheiland/PSmacmon/blob/master/Docs/Update-MacmonEndpointGroupProperty.md
 schema: 2.0.0
 ---
 
@@ -27,35 +27,44 @@ Not all properties configurable per RESTAPI are available in this function.
 
 ## EXAMPLES
 
-### BEISPIEL 1
-```
-$Credential = Get-Credential -Message 'Enter your credentials'
-```
-
-Update-MacmonEndpointGroupProperty -Hostname 'MACMONSERVER' -Credential $Credential -ID 187 -Name 'New Name'
-#Ask for credential then update name of endpointgroup with ID 187
-
-### BEISPIEL 2
-```
-$Properties = @{
-```
-
-Hostname               = 'MACMONSERVER'
-  ID                     = 188
-  name                   = 'New Name'
-  description            = 'New Description'
-  macStatisticActive     = $true
-  macValidity            = 14
-  obsoleteEndpointExpire = 180
-  authorizedVlansLow     = '10', '20', '30'
-  permissionLow          = 2
-  authorizedVlansMedium  = '20', '30'
-  permissionMedium       = 3
-  authorizedVlansHigh    = '30'
-  permissionHigh         = 1
+### Example 1
+```powershell
+$Params = @{
+  Hostname   = 'MACMONSERVER'
+  Credential = Get-Credential
+  ID         = 194
+  Name       = 'New Name'
 }
-Update-MacmonEndpointGroupProperty @Properties
-#update endpointgroup with ID 187 (all provided properties)
+Update-MacmonEndpointGroupProperty @Params
+```
+```
+#no output
+```
+Update name of Endpoint Group with ID 194.
+
+### Example 2
+```powershell
+$Params = @{
+  Hostname               = 'MACMONSERVER'
+  ID                     = 194
+  Name                   = 'New Name'
+  Description            = 'New Description'
+  MacStatisticActive     = $true
+  MacValidity            = 14
+  ObsoleteEndpointExpire = 180
+  AuthorizedVlansLow     = '10', '20', '30'
+  PermissionLow          = 2
+  AuthorizedVlansMedium  = '20', '30'
+  PermissionMedium       = 3
+  AuthorizedVlansHigh    = '30'
+  PermissionHigh         = 1
+}
+Update-MacmonEndpointGroupProperty @Params
+```
+```
+#no output
+```
+Update Endpoint Group with ID 194 (all provided properties).
 
 ## PARAMETERS
 
@@ -358,5 +367,5 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 [https://github.com/falkheiland/PSmacmon](https://github.com/falkheiland/PSmacmon)
 
-[https://<MACMONSERVER>/man/index.php?controller=ApiDocuController]()
+[https://MACMONSERVER/man/index.php?controller=ApiDocuController](https://MACMONSERVER/man/index.php?controller=ApiDocuController)
 

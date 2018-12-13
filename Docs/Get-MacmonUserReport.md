@@ -1,7 +1,7 @@
 ---
 external help file: PSmacmon-help.xml
 Module Name: PSmacmon
-online version: https://github.com/falkheiland/PSmacmon
+online version: https://github.com/falkheiland/PSmacmon/blob/master/Docs/Get-MacmonUserReport.md
 schema: 2.0.0
 ---
 
@@ -29,20 +29,67 @@ Get User report from the macmon NAC via RESTAPI.
 
 ## EXAMPLES
 
-### BEISPIEL 1
-```
+### Example 1
+```powershell
 $Credential = Get-Credential -Message 'Enter your credentials'
-```
-
 Get-MacmonUserReport -Hostname 'MACMONSERVER' -Credential $Credential
-#Ask for credential then get User reports from macmon NAC using provided credential
-
-### BEISPIEL 2
 ```
-5 | Get-MacmonUserReport -Hostname 'MACMONSERVER'
+```
+id             : 2
+shared         : False
+type           : REPORT_WIDGET
+description    :
+created        : 2018-09-03T07:06:29Z
+user           :
+userId         : 1
+parentReportId : deviceStatus
+title          : deviceStatus 2018-08-14 17:51:22
+updated        : 2018-10-08T13:31:53.789Z
+reportAsJson   : {"identifier":"widget-deviceStatus-20180814175122","tables":{"DEVICE__T__DEVICE":{"legitimationTable":"DEVICE","virtualTableName":null,"reportObject":"DEVICE","fields":{"IP":{"legitimationField":...
+link           : /reporting/index.php?controller=ReportController&group=net&report=deviceStatus&filter[DEVICE_JOB_STATUS___ERROR_COUNT]=>0&filter[DEVICE___ACTIVE]=1
+reportId       : widget-deviceStatus-20180814175122
+
+id             : 3
+shared         : False
+type           : REPORT_WIDGET
+description    :
+created        : 2018-09-03T07:06:29Z
+user           :
+userId         : 1
+parentReportId : interfaceEvents
+title          : Events with IF 2018-08-23 10:58:39
+updated        : 2018-10-08T13:31:53.820Z
+reportAsJson   : {"identifier":"widget-interfaceEvents-20180823105839"...
+link           : /reporting/index.php?controller=ReportController&group=events&report=interfaceEvents&filter%5BEVENT_IF__T__EVENT__F__EVENT___CREATED%5D=-24+hours&sorting%5BEVENT_IF__T__EVENT__F__EVENT___CREATED%5D=desc
+reportId       : widget-interfaceEvents-20180823105839
+```
+Get all user reports (excerpt).
+
+### Example 2
+```powershell
+$Params = @{
+  Hostname   = 'MACMONSERVER'
+  Credential = Get-Credential
+  Filter     = 'type==REPORT_WIDGET'
+  Fields     = 'id,title,reportId'
+  Sort       = 'title'
+}
+Get-MacmonUserReport @Params
+```
+```
+id title                                                    reportId
+-- -----                                                    --------
+ 6 DHCP Endpoint Update endpoitIdentity 2018-09-17 13:27:59 widget-auditlogb50f666fda6a9c99a627ffd8e2326831-20180917132759
+ 3 Events with IF 2018-08-23 10:58:39                       widget-interfaceEvents-20180823105839
+22 Inactive Endpoints 2018-10-08 15:31:40                   widget-authorizedMacsacb677da0c59aa103128703b36fa5168-20181008153140
+ 2 deviceStatus 2018-08-14 17:51:22                         widget-deviceStatus-20180814175122
+ 8 deviceStatus 2018-09-24 13:17:37                         widget-deviceStatus-20180924131737
+10 deviceStatus 2018-09-24 13:22:35                         widget-deviceStatus-20180924132235
+20 deviceStatus 2018-10-08 15:25:16                         widget-deviceStatus-20181008152516
+28 deviceStatus 2018-12-12 07:55:25                         widget-deviceStatus-20181212075525
 ```
 
-#Get User report with ID 5
+Get id, title and reportId from widget user reports, sorted by title
 
 ## PARAMETERS
 
@@ -122,7 +169,7 @@ Accept wildcard characters: False
 ```
 
 ### -Fields
-{{Fill Fields Description}}
+Select string (e.g. 'address,networkDeviceGroupId')
 
 ```yaml
 Type: String
@@ -137,7 +184,7 @@ Accept wildcard characters: False
 ```
 
 ### -Sort
-{{Fill Sort Description}}
+Sort string (e.g. 'active,address')
 
 ```yaml
 Type: String
@@ -152,7 +199,7 @@ Accept wildcard characters: False
 ```
 
 ### -Limit
-{{Fill Limit Description}}
+Limit int (e.g. 10)
 
 ```yaml
 Type: Int32
@@ -167,7 +214,7 @@ Accept wildcard characters: False
 ```
 
 ### -Offset
-{{Fill Offset Description}}
+Offset int (e.g. 10)
 
 ```yaml
 Type: Int32
@@ -182,7 +229,7 @@ Accept wildcard characters: False
 ```
 
 ### -Filter
-{{Fill Filter Description}}
+Filter string (e.g. '(id >=4 and id <= 10) and active == true and nac != true')
 
 ```yaml
 Type: String
@@ -210,5 +257,5 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 [https://github.com/falkheiland/PSmacmon](https://github.com/falkheiland/PSmacmon)
 
-[https://<MACMONSERVER>/man/index.php?controller=ApiDocuController]()
+[https://MACMONSERVER/man/index.php?controller=ApiDocuController](https://MACMONSERVER/man/index.php?controller=ApiDocuController)
 

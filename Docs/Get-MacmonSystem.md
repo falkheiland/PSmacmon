@@ -1,7 +1,7 @@
 ---
 external help file: PSmacmon-help.xml
 Module Name: PSmacmon
-online version: https://github.com/falkheiland/PSmacmon
+online version: https://github.com/falkheiland/PSmacmon/blob/master/Docs/Get-MacmonSystem.md
 schema: 2.0.0
 ---
 
@@ -41,34 +41,73 @@ Get System Infos from the macmon NAC via RESTAPI.
 
 ## EXAMPLES
 
-### BEISPIEL 1
+### Example 1
+```powershell
+$Params = @{
+  Hostname   = 'MACMONSERVER'
+  Credential = Get-Credential
+  Version    = $True
+}
+Get-MacmonSystem @Params
 ```
-$Credential = Get-Credential -Message 'Enter your credentials'
 ```
+5.8.0-29046
+```
+Get the version of the system.
 
-Get-MacmonSystem -Hostname 'MACMONSERVER' -Credential $Credential
-#Ask for credential then get the version of the system using provided credential
-
-### BEISPIEL 2
-```
+### Example 2
+```powershell
 Get-MacmonSystem -Hostname 'MACMONSERVER' -Documentation
 ```
-
-#Get the API docu as swagger JSON
-
-### BEISPIEL 3
+```json
+{
+  "swagger" : "2.0",
+  "info" : {
+    "description" : "<!--- https://help...
+    "version" : "1.0",
+    "title" : "macmon engine API",
+    "contact" : {
+      "name" : "macmon secure GmbH",
+      "url" : "https://macmon.eu",
+      "email" : "support@macmon.eu"
+    }
+...
+          "example" : "Name",
+          "description" : "Name of the VLAN",
+          "readOnly" : true
+        }
+      },
+      "description" : "A VLAN of an network device"
+    }
+  }
+}
 ```
-Get-MacmonSystem -Hostname 'MACMONSERVER' -IPs
-```
+Get the API docu as swagger JSON.
 
-#Get all local IP addresses of the system
-
-### BEISPIEL 4
+### Example 3
+```powershell
+$Params = @{
+  Hostname   = 'MACMONSERVER'
+  Credential = Get-Credential
+  IPs        = $True
+}
+Get-MacmonSystem @Params
 ```
+```
+0:0:0:0:0:0:0:1
+127.0.0.1
+192.168.0.10
+```
+Get all local IP addresses of the system.
+
+### Example 4
+```powershell
 Get-MacmonSystem -Hostname 'MACMONSERVER' -Uptime
 ```
-
-#Get up time of the system in milliseconds
+```
+7175562435
+```
+Get up time of the system in milliseconds.
 
 ## PARAMETERS
 
@@ -206,5 +245,5 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 [https://github.com/falkheiland/PSmacmon](https://github.com/falkheiland/PSmacmon)
 
-[https://<MACMONSERVER>/man/index.php?controller=ApiDocuController]()
+[https://MACMONSERVER/man/index.php?controller=ApiDocuController](https://MACMONSERVER/man/index.php?controller=ApiDocuController)
 

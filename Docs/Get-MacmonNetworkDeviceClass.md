@@ -164,7 +164,7 @@ Accept wildcard characters: False
 ```
 
 ### -Fields
-{{Fill Fields Description}}
+Select string (e.g. 'address,networkDeviceGroupId')
 
 ```yaml
 Type: String
@@ -179,7 +179,7 @@ Accept wildcard characters: False
 ```
 
 ### -Sort
-{{Fill Sort Description}}
+Sort string (e.g. 'active,address')
 
 ```yaml
 Type: String
@@ -194,7 +194,7 @@ Accept wildcard characters: False
 ```
 
 ### -Limit
-{{Fill Limit Description}}
+Limit int (e.g. 10)
 
 ```yaml
 Type: Int32
@@ -209,7 +209,7 @@ Accept wildcard characters: False
 ```
 
 ### -Offset
-{{Fill Offset Description}}
+Offset int (e.g. 10)
 
 ```yaml
 Type: Int32
@@ -224,7 +224,7 @@ Accept wildcard characters: False
 ```
 
 ### -Filter
-{{Fill Filter Description}}
+Filter string (e.g. '(id >=4 and id <= 10) and active == true and nac != true')
 
 ```yaml
 Type: String

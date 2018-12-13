@@ -1,7 +1,7 @@
 ---
 external help file: PSmacmon-help.xml
 Module Name: PSmacmon
-online version: https://github.com/falkheiland/PSmacmon
+online version: https://github.com/falkheiland/PSmacmon/blob/master/Docs/Remove-MacmonEndpointProperty.md
 schema: 2.0.0
 ---
 
@@ -24,29 +24,39 @@ Not all properties configurable per RESTAPI are available in this function.
 
 ## EXAMPLES
 
-### BEISPIEL 1
-```
-$Credential = Get-Credential -Message 'Enter your credentials'
-```
-
-Remove-MacmonEndpointProperty -Hostname 'MACMONSERVER' -Credential $Credential -MACAddress '8C-73-6E-0B-33-6E' -Comment
-#Ask for credential then remove comment of endpoint with MACAddress '8C-73-6E-0B-33-6E'
-
-### BEISPIEL 2
-```
-$Properties = @{
-```
-
-Hostname               = 'MACMONSERVER'
-  MACAddress             = '8C-73-6E-0B-33-6E'
-  Comment                = $true
-  StaticIps              = $true
-  Inventory              = $true
-  AuthorizedVlans        = $true
-  EndpointGroupId        = $true
+### Example 1
+```powershell
+$Params = @{
+  Hostname   = 'MACMONSERVER'
+  Credential = Get-Credential
+  MACAddress = '00-11-22-33-44-55'
+  Comment    = $True
 }
-Remove-MacmonEndpointProperty @Properties
-#remove all supported properties from endpoint with MACAddress '8C-73-6E-0B-33-6E'
+Remove-MacmonEndpointProperty @Params
+```
+```
+#no output
+```
+Remove comment of endpoint with MACAddress '00-11-22-33-44-55'.
+
+### Example 2
+```powershell
+$Params = @{
+  Hostname        = 'MACMONSERVER'
+  Credential      = Get-Credential
+  MACAddress      = '00-11-22-33-44-55'
+  Comment         = $true
+  StaticIps       = $true
+  Inventory       = $true
+  AuthorizedVlans = $true
+  EndpointGroupId = $true
+}
+Remove-MacmonEndpointProperty @Params
+```
+```
+#no output
+```
+Remove all supported properties from endpoint with MACAddress '00-11-22-33-44-55'.
 
 ## PARAMETERS
 
@@ -246,5 +256,5 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 [https://github.com/falkheiland/PSmacmon](https://github.com/falkheiland/PSmacmon)
 
-[https://<MACMONSERVER>/man/index.php?controller=ApiDocuController]()
+[https://MACMONSERVER/man/index.php?controller=ApiDocuController](https://MACMONSERVER/man/index.php?controller=ApiDocuController)
 

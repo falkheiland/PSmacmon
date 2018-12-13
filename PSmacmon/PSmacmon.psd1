@@ -115,13 +115,13 @@
     PSData = @{
 
       # 'Tags' wurde auf das Modul angewendet und unterstützt die Modulermittlung in Onlinekatalogen.
-      # Tags = @()
+      Tags       = @('macmon', 'NAC')
 
       # Eine URL zur Lizenz für dieses Modul.
-      # LicenseUri = ''
+      LicenseUri = 'https://github.com/falkheiland/PSmacmon/blob/master/LICENSE'
 
       # Eine URL zur Hauptwebsite für dieses Projekt.
-      # ProjectUri = ''
+      ProjectUri = 'https://github.com/falkheiland/PSmacmon'
 
       # Eine URL zu einem Symbol, das das Modul darstellt.
       # IconUri = ''

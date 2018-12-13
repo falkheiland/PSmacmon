@@ -1,7 +1,7 @@
 ---
 external help file: PSmacmon-help.xml
 Module Name: PSmacmon
-online version: https://github.com/falkheiland/PSmacmon
+online version: https://github.com/falkheiland/PSmacmon/blob/master/Docs/Get-MacmonUserProperty.md
 schema: 2.0.0
 ---
 
@@ -30,20 +30,25 @@ Get User property from the macmon NAC via RESTAPI.
 
 ## EXAMPLES
 
-### BEISPIEL 1
+### Example 1
+```powershell
+$Params = @{
+  Hostname   = 'MACMONSERVER'
+  Credential = Get-Credential
+}
+Get-MacmonUserProperty @Params
 ```
-$Credential = Get-Credential -Message 'Enter your credentials'
 ```
-
-Get-MacmonUserProperty -Hostname 'MACMONSERVER' -Credential $Credential
-#Ask for credential then get User propertys from macmon NAC using provided credential
-
-### BEISPIEL 2
+id               : 20
+description      : P1Description1
+label            : P1Title
+ownValuesAllowed : True
+required         : True
+possibleValues   : {, }
+propertyObject   : DEVICE
+name             : P1Name
 ```
-10 | Get-MacmonUserProperty -Hostname 'MACMONSERVER'
-```
-
-#Get User property with ID 10
+Get all user properties.
 
 ## PARAMETERS
 
@@ -123,7 +128,7 @@ Accept wildcard characters: False
 ```
 
 ### -Fields
-{{Fill Fields Description}}
+Select string (e.g. 'address,networkDeviceGroupId')
 
 ```yaml
 Type: String
@@ -138,7 +143,7 @@ Accept wildcard characters: False
 ```
 
 ### -Sort
-{{Fill Sort Description}}
+Sort string (e.g. 'active,address')
 
 ```yaml
 Type: String
@@ -153,7 +158,7 @@ Accept wildcard characters: False
 ```
 
 ### -Limit
-{{Fill Limit Description}}
+Limit int (e.g. 10)
 
 ```yaml
 Type: Int32
@@ -168,7 +173,7 @@ Accept wildcard characters: False
 ```
 
 ### -Offset
-{{Fill Offset Description}}
+Offset int (e.g. 10)
 
 ```yaml
 Type: Int32
@@ -183,7 +188,7 @@ Accept wildcard characters: False
 ```
 
 ### -Filter
-{{Fill Filter Description}}
+Filter string (e.g. '(id >=4 and id <= 10) and active == true and nac != true')
 
 ```yaml
 Type: String
@@ -211,5 +216,5 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 [https://github.com/falkheiland/PSmacmon](https://github.com/falkheiland/PSmacmon)
 
-[https://<MACMONSERVER>/man/index.php?controller=ApiDocuController]()
+[https://MACMONSERVER/man/index.php?controller=ApiDocuController](https://MACMONSERVER/man/index.php?controller=ApiDocuController)
 
