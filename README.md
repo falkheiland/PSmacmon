@@ -14,61 +14,61 @@ My goal is to support all API-functionalities. Suggestions are welcome.
 
 ## Functions
 
-### [Get-MacmonCredential](Get-MacmonCredential.md)
+### [Get-MacmonCredential](/Docs/Get-MacmonCredential.md)
 Get Credentials.
 
-### [Get-MacmonEndpoint](Get-MacmonEndpoint.md)
+### [Get-MacmonEndpoint](/Docs/Get-MacmonEndpoint.md)
 Get Endpoint.
 
-### [Get-MacmonEndpointGroup](Get-MacmonEndpointGroup.md)
+### [Get-MacmonEndpointGroup](/Docs/Get-MacmonEndpointGroup.md)
 Get Endpoint Group.
 
-### [Get-MacmonLicenseOption](Get-MacmonLicenseOption.md)
+### [Get-MacmonLicenseOption](/Docs/Get-MacmonLicenseOption.md)
 Get License Option.
 
-### [Get-MacmonNetworkDevice](Get-MacmonNetworkDevice.md)
+### [Get-MacmonNetworkDevice](/Docs/Get-MacmonNetworkDevice.md)
 Get Network Device.
 
-### [Get-MacmonNetworkDeviceClass](Get-MacmonNetworkDeviceClass.md)
+### [Get-MacmonNetworkDeviceClass](/Docs/Get-MacmonNetworkDeviceClass.md)
 Get Network Device Class.
 
-### [Get-MacmonNetworkDeviceGroup](Get-MacmonNetworkDeviceGroup.md)
+### [Get-MacmonNetworkDeviceGroup](/Docs/Get-MacmonNetworkDeviceGroup.md)
 Get Network Device Group.
 
-### [Get-MacmonNetworkSegment](Get-MacmonNetworkSegment.md)
+### [Get-MacmonNetworkSegment](/Docs/Get-MacmonNetworkSegment.md)
 Get Network Segment.
 
-### [Get-MacmonReport](Get-MacmonReport.md)
+### [Get-MacmonReport](/Docs/Get-MacmonReport.md)
 Get result of report as object or as file.
 
-### [Get-MacmonSetting](Get-MacmonSetting.md)
+### [Get-MacmonSetting](/Docs/Get-MacmonSetting.md)
 Get Setting.
 
-### [Get-MacmonSystem](Get-MacmonSystem.md)
+### [Get-MacmonSystem](/Docs/Get-MacmonSystem.md)
 Get System Info.
 
-### [Get-MacmonUserProperty](Get-MacmonUserProperty.md)
+### [Get-MacmonUserProperty](/Docs/Get-MacmonUserProperty.md)
 Get User Property.
 
-### [Get-MacmonUserReport](Get-MacmonUserReport.md)
+### [Get-MacmonUserReport](/Docs/Get-MacmonUserReport.md)
 Get User Report.
 
-### [New-MacmonEndpoint](New-MacmonEndpoint.md)
+### [New-MacmonEndpoint](/Docs/New-MacmonEndpoint.md)
 Create Endpoint.
 
-### [New-MacmonEndpointGroup](New-MacmonEndpointGroup.md)
+### [New-MacmonEndpointGroup](/Docs/New-MacmonEndpointGroup.md)
 Create Endpoint Group.
 
-### [New-MacmonNetworkDevice](New-MacmonNetworkDevice.md)
+### [New-MacmonNetworkDevice](/Docs/New-MacmonNetworkDevice.md)
 Create Network Device.
 
-### [Remove-MacmonEndpointProperty](Remove-MacmonEndpointProperty.md)
+### [Remove-MacmonEndpointProperty](/Docs/Remove-MacmonEndpointProperty.md)
 Remove Endpoint Property.
 
-### [Update-MacmonEndpointGroupProperty](Update-MacmonEndpointGroupProperty.md)
+### [Update-MacmonEndpointGroupProperty](/Docs/Update-MacmonEndpointGroupProperty.md)
 Update Endpoint Group Property.
 
-### [Update-MacmonEndpointProperty](Update-MacmonEndpointProperty.md)
+### [Update-MacmonEndpointProperty](/Docs/Update-MacmonEndpointProperty.md)
 Update Endpoint Property.
 
 
