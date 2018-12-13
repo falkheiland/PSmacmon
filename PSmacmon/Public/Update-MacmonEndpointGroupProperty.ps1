@@ -161,116 +161,111 @@ function Update-MacmonEndpointGroupProperty
 
   begin
   {
+    Invoke-MacmonTrustSelfSignedCertificate
+    $UriArray = @($HostName, $TCPPort, $ApiVersion)
+    $BaseURL = ('https://{0}:{1}/api/v{2}/endpointgroups' -f $UriArray)
+    $Params = @{
+      Credential = $Credential
+      Method     = 'Patch'
+    }
+    $Body = @()
+    $Op = 'replace'
   }
   process
   {
-    Invoke-MacmonTrustSelfSignedCertificate
     if ($Name)
     {
-      $BodyName = [ordered]@{
-        op    = 'replace'
+      $Body += @{
+        op    = $Op
         path  = '/name'
         value = $Name
-      } | ConvertTo-Json
+      }
     }
     if ($Description)
     {
-      $BodyDescription = [ordered]@{
-        op    = 'replace'
+      $Body += @{
+        op    = $Op
         path  = '/description'
         value = $Description
-      } | ConvertTo-Json
+      }
     }
     if ($MacStatisticActive)
     {
-      $BodyMacStatisticActive = [ordered]@{
-        op    = 'replace'
+      $Body += @{
+        op    = $Op
         path  = '/macStatisticActive'
         value = $MacStatisticActive
-      } | ConvertTo-Json
+      }
     }
     if ($MacValidity)
     {
-      $BodyMacValidity = [ordered]@{
-        op    = 'replace'
+      $Body += @{
+        op    = $Op
         path  = '/macValidity'
         value = $MacValidity * 86400
-      } | ConvertTo-Json
+      }
     }
     if ($ObsoleteEndpointExpire)
     {
-      $BodyObsoleteEndpointExpire = [ordered]@{
-        op    = 'replace'
+      $Body += @{
+        op    = $Op
         path  = '/obsoleteEndpointExpire'
         value = $ObsoleteEndpointExpire * 86400
-      } | ConvertTo-Json
+      }
     }
     if ($AuthorizedVlansLow)
     {
-      $BodyAuthorizedVlansLow = [ordered]@{
-        op    = 'replace'
+      $Body += @{
+        op    = $Op
         path  = '/authorizedVlansLow'
         value = $AuthorizedVlansLow
-      } | ConvertTo-Json
+      }
     }
     if ($PermissionLow)
     {
-      $BodyPermissionLow = [ordered]@{
-        op    = 'replace'
+      $Body += @{
+        op    = $Op
         path  = '/permissionLow'
         value = $PermissionLow
-      } | ConvertTo-Json
+      }
     }
     if ($AuthorizedVlansMedium)
     {
-      $BodyAuthorizedVlansMedium = [ordered]@{
-        op    = 'replace'
+      $Body += @{
+        op    = $Op
         path  = '/authorizedVlansMedium'
         value = $AuthorizedVlansMedium
-      } | ConvertTo-Json
+      }
     }
     if ($PermissionMedium)
     {
-      $BodyPermissionMedium = [ordered]@{
-        op    = 'replace'
+      $Body += @{
+        op    = $Op
         path  = '/permissionMedium'
         value = $PermissionMedium
-      } | ConvertTo-Json
+      }
     }
     if ($AuthorizedVlansHigh)
     {
-      $BodyAuthorizedVlansHigh = [ordered]@{
-        op    = 'replace'
+      $Body += @{
+        op    = $Op
         path  = '/authorizedVlansHigh'
         value = $AuthorizedVlansHigh
-      } | ConvertTo-Json
+      }
     }
     if ($PermissionHigh)
     {
-      $BodyPermissionHigh = [ordered]@{
-        op    = 'replace'
+      $Body += @{
+        op    = $Op
         path  = '/permissionHigh'
         value = $PermissionHigh
-      } | ConvertTo-Json
-    }
-    foreach ($item in ($BodyName, $BodyDescription, $BodyMacStatisticActive, $BodyMacValidity,
-        $BodyObsoleteEndpointExpire, $BodyAuthorizedVlansLow, $BodyPermissionLow, $BodyAuthorizedVlansMedium,
-        $BodyPermissionMedium, $BodyAuthorizedVlansHigh, $BodyPermissionHigh))
-    {
-      if ($item)
-      {
-        $Body = $item.ToString(), $Body -join ",`r`n"
       }
     }
-    $Body = $Body.TrimEnd() -replace ',$'
-    if ($Body)
+    $Params.Add('Body', (ConvertTo-Json $Body))
+    $Params.Add('Uri', ('{0}/{1}' -f $BaseURL, $ID))
+    if ($PSCmdlet.ShouldProcess('EndpointGroup: {0}' -f $ID))
     {
-      $BaseURL = ('https://{0}:{1}/api/v{2}/endpointgroups' -f $HostName, $TCPPort, $ApiVersion)
-      $SessionURL = ('{0}/{1}' -f $BaseURL, $ID)
-      if ($PSCmdlet.ShouldProcess('EndpointGroup: {0}' -f $ID))
-      {
-        Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -BodyBrackets $Body -Method 'Patch'
-      }
+      Invoke-MacmonRestMethod @Params
     }
   }
   end

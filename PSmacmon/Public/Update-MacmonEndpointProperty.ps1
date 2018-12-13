@@ -28,15 +28,11 @@ function Update-MacmonEndpointProperty
     .PARAMETER Active
     String, True or False. An inactive (deactivated) corporate device is evaluated as unauthorized.
 
-    .PARAMETER StaticIps
+    .PARAMETER IPAddress
     Preset IP address(es) of the endpoint
 
     .PARAMETER Inventory
     Inventory number of the endpoint.
-
-    .PARAMETER ExpireTime
-    Defines the time after which the endpoint is automatically deactivated or deleted,
-    depending on the scan engine setting endpoint_expire_action.
 
     .PARAMETER AuthorizedVlans
     Blank space separated list of permitted VLAN IDs or VLAN names
@@ -55,10 +51,9 @@ function Update-MacmonEndpointProperty
       MACAddress             = '8C-73-6E-0B-33-6E'
       Comment                = 'New Comment'
       Active                 = 'False'
-      StaticIps              = '192.168.1.1', '10.10.10.11'
+      IPAddress              = '192.168.1.1', '10.10.10.11'
       Inventory              = '012345'
-      #ExpireTime            = '2022-08-23T10:05:00Z' #API bug
-      #AuthorizedVlans       = '10', '20', '30' #API bug
+      AuthorizedVlans       = '10', '20', '30' #API bug
       EndpointGroupId        = 11
     }
     Update-MacmonEndpointProperty @Properties
@@ -106,105 +101,87 @@ function Update-MacmonEndpointProperty
     [ValidateSet('True', 'False')]
     $Active,
 
+    [ValidateScript( {$_ -match [IPAddress]$_})]
+    [Alias('StaticIps')]
     [string[]]
-    [ValidateScript( {$_ -match [IPAddress]$_ })]
-    $StaticIps,
+    $IPAddress,
 
     [string]
     $Inventory,
 
-    #API bug
-    #'2018-08-23T10:05:00Z'
-    #[datetime]
-    #$ExpireTime,
-
-    #API bug
-    #[string[]]
-    #$AuthorizedVlans,
+    [string[]]
+    $AuthorizedVlans,
 
     [int]
     $EndpointGroupId
   )
-
   begin
   {
+    Invoke-MacmonTrustSelfSignedCertificate
+    $UriArray = @($HostName, $TCPPort, $ApiVersion)
+    $BaseURL = ('https://{0}:{1}/api/v{2}/endpoints' -f $UriArray)
+    $Params = @{
+      Credential = $Credential
+      Method     = 'Patch'
+    }
+    $Body = @()
+    $Op = 'replace'
   }
   process
   {
-    Invoke-MacmonTrustSelfSignedCertificate
     if ($Comment)
     {
-      $BodyComment = [ordered]@{
-        op    = 'replace'
+      $Body += @{
+        op    = $Op
         path  = '/comment'
         value = $Comment
-      } | ConvertTo-Json
+      }
     }
     if ($Active)
     {
-      $BodyActive = [ordered]@{
-        op    = 'replace'
+      $Body += @{
+        op    = $Op
         path  = '/active'
         value = $Active
-      } | ConvertTo-Json
+      }
     }
-    if ($StaticIps)
+    if ($IPAddress)
     {
-      $BodyStaticIps = [ordered]@{
-        op    = 'replace'
+      $Body += @{
+        op    = $Op
         path  = '/staticIps'
-        value = $StaticIps
-      } | ConvertTo-Json
+        value = $IPAddress
+      }
     }
     if ($Inventory)
     {
-      $BodyInventory = [ordered]@{
-        op    = 'replace'
+      $Body += @{
+        op    = $Op
         path  = '/inventory'
         value = $Inventory
-      } | ConvertTo-Json
-    }
-    if ($ExpireTime)
-    {
-      $BodyExpireTime = [ordered]@{
-        op    = 'replace'
-        path  = '/expireTime'
-        value = $ExpireTime
-      } | ConvertTo-Json
+      }
     }
     if ($AuthorizedVlans)
     {
-      $BodyAuthorizedVlans = [ordered]@{
-        op    = 'replace'
+      $Body += @{
+        op    = $Op
         path  = '/authorizedVlans'
-        value = $AuthorizedVlans
-      } | ConvertTo-Json
+        value = @($AuthorizedVlans)
+      }
     }
     if ($EndpointGroupId)
     {
-      $BodyEndpointGroupId = [ordered]@{
-        op    = 'replace'
+      $Body += @{
+        op    = $Op
         path  = '/endpointGroupId'
         value = $EndpointGroupId
-      } | ConvertTo-Json
-    }
-    foreach ($item in ($BodyComment, $BodyActive, $BodyStaticIps, $BodyInventory,
-        $BodyExpireTime, $BodyAuthorizedVlans, $BodyEndpointGroupId))
-    {
-      if ($item)
-      {
-        $Body = $item.ToString(), $Body -join ",`r`n"
       }
     }
-    $Body = $Body.TrimEnd() -replace ',$'
-    if ($Body)
+    $Params.Add('Body', (ConvertTo-Json $Body))
+    $Params.Add('Uri', ('{0}/{1}' -f $BaseURL, $MACAddress))
+    if ($PSCmdlet.ShouldProcess('EndpointGroup: {0}' -f $MACAddress))
     {
-      $BaseURL = ('https://{0}:{1}/api/v{2}/endpoints' -f $HostName, $TCPPort, $ApiVersion)
-      $SessionURL = ('{0}/{1}' -f $BaseURL, $MACAddress)
-      if ($PSCmdlet.ShouldProcess('EndpointGroup: {0}' -f $MACAddress))
-      {
-        Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -BodyBrackets $Body -Method 'Patch'
-      }
+      Invoke-MacmonRestMethod @Params
     }
   }
   end

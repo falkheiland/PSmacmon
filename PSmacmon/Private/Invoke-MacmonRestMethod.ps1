@@ -8,13 +8,13 @@ function Invoke-MacmonRestMethod
     Invoke-RestMethod Wrapper for macmon API
 
     .EXAMPLE
-    Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Method 'Get'
+    Invoke-MacmonRestMethod -Credential $Credential -Uri $Uri -Method 'Get'
 
     .NOTES
      n.a.
     #>
 
-  [CmdletBinding(DefaultParameterSetName = 'NoBody')]
+  [CmdletBinding()]
   param (
     [Parameter(Mandatory)]
     [System.Management.Automation.PSCredential]
@@ -23,15 +23,13 @@ function Invoke-MacmonRestMethod
 
     [Parameter(Mandatory)]
     [string]
-    $SessionURL,
+    $Uri,
 
-    [Parameter(ParameterSetName = 'Body')]
     [string]
     $Body,
 
-    [Parameter(ParameterSetName = 'BodyBrackets')]
     [string]
-    $BodyBrackets,
+    $OutFile,
 
     [Parameter(Mandatory)]
     [ValidateSet('Get', 'Post', 'Delete', 'Patch', 'Put')]
@@ -41,47 +39,19 @@ function Invoke-MacmonRestMethod
 
   begin
   {
+    $CredString = ("{0}:{1}" -f $Credential.UserName, $Credential.GetNetworkCredential().Password)
+    $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes($CredString))
   }
   process
   {
-    $Username = $Credential.UserName
-    $Password = $Credential.GetNetworkCredential().Password
-    $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f $Username, $Password)))
-    switch ($PSCmdlet.ParameterSetName)
-    {
-      Body
-      {
-        $Params = @{
-          Uri         = $SessionURL
-          Headers     = @{Authorization = ("Basic {0}" -f $base64AuthInfo)}
-          Body        = '{0}' -f $Body
-          ContentType = 'application/json'
-          Method      = $Method
-        }
-      }
-      BodyBrackets
-      {
-        $Params = @{
-          Uri         = $SessionURL
-          Headers     = @{Authorization = ("Basic {0}" -f $base64AuthInfo)}
-          Body        = '[{0}]' -f $BodyBrackets
-          ContentType = 'application/json'
-          Method      = $Method
-        }
-      }
-      NoBody
-      {
-        $Params = @{
-          Uri         = $SessionURL
-          Headers     = @{Authorization = ("Basic {0}" -f $base64AuthInfo)}
-          ContentType = 'application/json'
-          Method      = $Method
-        }
-      }
-    }
     try
     {
-      Invoke-RestMethod @Params -ErrorAction Stop
+      [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+      $PSBoundParameters.Add('Headers', @{Authorization = ("Basic {0}" -f $base64AuthInfo)})
+      $PSBoundParameters.Add('ContentType', 'application/json; charset=utf-8')
+      $PSBoundParameters.Add('ErrorAction', 'Stop')
+      $Null = $PSBoundParameters.Remove('Credential')
+      Invoke-RestMethod @PSBoundParameters
     }
     catch [System.Net.WebException]
     {
@@ -89,35 +59,35 @@ function Invoke-MacmonRestMethod
       {
         200
         {
-          Write-Warning -Message ('Success. SessionURL: {0} Method: {1}' -f $SessionURL, $Method)
+          Write-Warning -Message ('Success. Uri: {0} Method: {1}' -f $Uri, $Method)
         }
         204
         {
-          Write-Warning -Message ('Success, but no return. SessionURL: {0} Method: {1}' -f $SessionURL, $Method)
+          Write-Warning -Message ('Success, but no return. Uri: {0} Method: {1}' -f $Uri, $Method)
         }
         400
         {
-          Write-Warning -Message ('Request error. SessionURL: {0} Method: {1}' -f $SessionURL, $Method)
+          Write-Warning -Message ('Request error. Uri: {0} Method: {1}' -f $Uri, $Method)
         }
         404
         {
-          Write-Warning -Message ('Page or object not found. SessionURL: {0} Method: {1}' -f $SessionURL, $Method)
+          Write-Warning -Message ('Page or object not found. Uri: {0} Method: {1}' -f $Uri, $Method)
         }
         405
         {
-          Write-Warning -Message ('Invalid method. SessionURL: {0} Method: {1}' -f $SessionURL, $Method)
+          Write-Warning -Message ('Invalid method. Uri: {0} Method: {1}' -f $Uri, $Method)
         }
         500
         {
-          Write-Warning -Message ('Internal server error. SessionURL: {0} Method: {1}' -f $SessionURL, $Method)
+          Write-Warning -Message ('Internal server error. Uri: {0} Method: {1}' -f $Uri, $Method)
         }
-        901
+        911
         {
-          Write-Warning -Message ('Application error. SessionURL: {0} Method: {1}' -f $SessionURL, $Method)
+          Write-Warning -Message ('Application error. Uri: {0} Method: {1}' -f $Uri, $Method)
         }
         default
         {
-          Write-Warning -Message ('Some error occured, see HTTP status code for further details. SessionURL: {0} Method: {1}' -f $SessionURL, $Method)
+          Write-Warning -Message ('Some error occured, see HTTP status code for further details. Uri: {0} Method: {1}' -f $Uri, $Method)
         }
       }
     }

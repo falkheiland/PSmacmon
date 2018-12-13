@@ -53,7 +53,6 @@ function Remove-MacmonEndpointProperty
       Comment                = $true
       StaticIps              = $true
       Inventory              = $true
-      ExpireTime             = $true
       AuthorizedVlans        = $true
       EndpointGroupId        = $true
     }
@@ -105,9 +104,6 @@ function Remove-MacmonEndpointProperty
     $Inventory,
 
     [switch]
-    $ExpireTime,
-
-    [switch]
     $AuthorizedVlans,
 
     [switch]
@@ -116,69 +112,58 @@ function Remove-MacmonEndpointProperty
 
   begin
   {
+    Invoke-MacmonTrustSelfSignedCertificate
+    $UriArray = @($HostName, $TCPPort, $ApiVersion)
+    $BaseURL = ('https://{0}:{1}/api/v{2}/endpoints' -f $UriArray)
+    $Params = @{
+      Credential = $Credential
+      Method     = 'Patch'
+    }
+    $Body = @()
+    $Op = 'remove'
   }
   process
   {
-    Invoke-MacmonTrustSelfSignedCertificate
     if ($Comment)
     {
-      $BodyComment = [ordered]@{
-        op   = 'remove'
+      $Body += @{
+        op   = $Op
         path = '/comment'
-      } | ConvertTo-Json
+      }
     }
     if ($StaticIps)
     {
-      $BodyStaticIps = [ordered]@{
-        op   = 'remove'
+      $Body += @{
+        op   = $Op
         path = '/staticIps'
-      } | ConvertTo-Json
+      }
     }
     if ($Inventory)
     {
-      $BodyInventory = [ordered]@{
-        op   = 'remove'
+      $Body += @{
+        op   = $Op
         path = '/inventory'
-      } | ConvertTo-Json
-    }
-    if ($ExpireTime)
-    {
-      $BodyExpireTime = [ordered]@{
-        op   = 'remove'
-        path = '/expireTime'
-      } | ConvertTo-Json
+      }
     }
     if ($AuthorizedVlans)
     {
-      $BodyAuthorizedVlans = [ordered]@{
-        op   = 'remove'
+      $Body += @{
+        op   = $Op
         path = '/authorizedVlans'
-      } | ConvertTo-Json
+      }
     }
     if ($EndpointGroupId)
     {
-      $BodyEndpointGroupId = [ordered]@{
-        op   = 'remove'
+      $Body += @{
+        op   = $Op
         path = '/endpointGroupId'
-      } | ConvertTo-Json
-    }
-    foreach ($item in ($BodyComment, $BodyStaticIps, $BodyInventory,
-        $BodyExpireTime, $BodyAuthorizedVlans, $BodyEndpointGroupId))
-    {
-      if ($item)
-      {
-        $Body = $item.ToString(), $Body -join ",`r`n"
       }
     }
-    $Body = $Body.TrimEnd() -replace ',$'
-    if ($Body)
+    $Params.Add('Body', (ConvertTo-Json $Body))
+    $Params.Add('Uri', ('{0}/{1}' -f $BaseURL, $MACAddress))
+    if ($PSCmdlet.ShouldProcess('EndpointGroup: {0}' -f $MACAddress))
     {
-      $BaseURL = ('https://{0}:{1}/api/v{2}/endpoints' -f $HostName, $TCPPort, $ApiVersion)
-      $SessionURL = ('{0}/{1}' -f $BaseURL, $MACAddress)
-      if ($PSCmdlet.ShouldProcess('EndpointGroup: {0}' -f $MACAddress))
-      {
-        Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -BodyBrackets $Body -Method 'Patch'
-      }
+      Invoke-MacmonRestMethod @Params
     }
   }
   end

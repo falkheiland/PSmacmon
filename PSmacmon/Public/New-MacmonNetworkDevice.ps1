@@ -28,6 +28,9 @@ function New-MacmonNetworkDevice
     .PARAMETER Nac
     True, if network access control active. (Default: False)
 
+    .PARAMETER NetworkDeviceClassId
+    Device class ID. If no device class with the respective SNMP System ID exists yet, then it is automatically created.
+
     .PARAMETER NetworkDeviceGroupId
     Device group ID. If no group is specified, only the SNMP basic data are queried from the network device.
 
@@ -58,18 +61,19 @@ function New-MacmonNetworkDevice
 
     .EXAMPLE
     $Credential = Get-Credential -Message 'Enter your credentials'
-    New-MacmonNetworkDevice -Hostname 'MACMONSERVER' -Credential $Credential -Address 'NEWSWITCH'
-    #Ask for credential then create new network device with address 'NEWSWITCH' (minimum requirement)
+    New-MacmonNetworkDevice -Hostname 'MACMONSERVER' -Credential $Credential -Address '192.168.0.1'
+    #Ask for credential then create new network device with address '192.168.0.1' (minimum requirement)
 
     .EXAMPLE
     $Properties = @{
       Hostname              = 'MACMONSERVER'
-      address               = '192.168.0.1'
+      address               = '192.168.3.1'
       active                = $true
       nac                   = $false
       ignoreHardwareChanges = $true
       enabledProtocols      = ('snmpv3', 'snmpv2c')
       interfaceStatistic    = $true
+      networkDeviceClassId  = 84
       networkDeviceGroupId  = 14
       description           = 'New Device'
       location              = 'Cabinet 1'
@@ -120,6 +124,9 @@ function New-MacmonNetworkDevice
     $Nac = $false,
 
     [int]
+    $NetworkDeviceClassId,
+
+    [int]
     $NetworkDeviceGroupId,
 
     [string]
@@ -137,8 +144,6 @@ function New-MacmonNetworkDevice
     [bool]
     $InterfaceStatistic = $false,
 
-    $UserValues,
-
     [ValidatePattern("^[(http(s)?):\/\/].*")]
     [string]
     $WebInterfaceUrl,
@@ -149,11 +154,16 @@ function New-MacmonNetworkDevice
 
   begin
   {
+    Invoke-MacmonTrustSelfSignedCertificate
+    $UriArray = @($HostName, $TCPPort, $ApiVersion)
+    $BaseURL = ('https://{0}:{1}/api/v{2}/networkdevices' -f $UriArray)
+    $Params = @{
+      Credential = $Credential
+      Method     = 'Post'
+    }
   }
   process
   {
-    Invoke-MacmonTrustSelfSignedCertificate
-
     $Body = @{
       address               = $Address
       active                = $Active
@@ -161,6 +171,10 @@ function New-MacmonNetworkDevice
       ignoreHardwareChanges = $IgnoreHardwareChanges
       enabledProtocols      = $EnabledProtocols
       interfaceStatistic    = $InterfaceStatistic
+    }
+    if ($NetworkDeviceClassId)
+    {
+      $Body.add('networkDeviceClassId', $NetworkDeviceClassId)
     }
     if ($NetworkDeviceGroupId)
     {
@@ -182,13 +196,11 @@ function New-MacmonNetworkDevice
     {
       $Body.add('credentialIds', $CredentialIds)
     }
-    $Body = $Body | ConvertTo-Json
-$Body
-    $BaseURL = ('https://{0}:{1}/api/v{2}/networkdevices' -f $HostName, $TCPPort, $ApiVersion)
-    $SessionURL = ('{0}' -f $BaseURL)
-    if ($PSCmdlet.ShouldProcess('network deviceGroup: {0}' -f $Name))
+    $params.Add('Body', (ConvertTo-Json $Body))
+    $params.Add('Uri', ('{0}' -f $BaseURL))
+    if ($PSCmdlet.ShouldProcess('network device: {0}' -f $Name))
     {
-      Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Body $Body -Method 'Post'
+      Invoke-MacmonRestMethod @Params
     }
   }
   end

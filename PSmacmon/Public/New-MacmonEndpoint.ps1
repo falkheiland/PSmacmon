@@ -34,9 +34,6 @@ function New-MacmonEndpoint
     .PARAMETER Inventory
     Inventory number of the endpoint.
 
-    .PARAMETER ExpireTime
-    Defines the time after which the endpoint is automatically deactivated or deleted,
-    depending on the scan engine setting endpoint_expire_action.
 
     .PARAMETER AuthorizedVlans
     Blank space separated list of permitted VLAN IDs or VLAN names
@@ -55,9 +52,8 @@ function New-MacmonEndpoint
       mac             = '00-11-22-33-44-55'
       comment         = 'new Enpoint-Device'
       active          = $true
-      staticIps       = '192.168.30.1', '192.168.1.2'
+      staticIps       = '192.168.3.1', '192.168.1.2'
       inventory       = '012345'
-      expireTime      = '2025-01-01T00:00:00Z'
       authorizedVlans = '10', '11'
       endpointGroupId = 0
     }
@@ -114,10 +110,6 @@ function New-MacmonEndpoint
     [string]
     $Inventory,
 
-    #'2018-08-23T10:05:00Z'
-    [datetime]
-    $ExpireTime,
-
     [string[]]
     $AuthorizedVlans,
 
@@ -127,34 +119,45 @@ function New-MacmonEndpoint
 
   begin
   {
+    Invoke-MacmonTrustSelfSignedCertificate
+    $UriArray = @($HostName, $TCPPort, $ApiVersion)
+    $BaseURL = ('https://{0}:{1}/api/v{2}/endpoints' -f $UriArray)
+    $Params = @{
+      Credential = $Credential
+      Method     = 'Post'
+    }
   }
   process
   {
-    Invoke-MacmonTrustSelfSignedCertificate
-
-    $Body = [ordered]@{
-      mac             = $MACAddress
-      comment         = $Comment
-      active          = $Active
-      inventory       = $Inventory
-      expireTime      = $ExpireTime
-      authorizedVlans = $AuthorizedVlans
+    $Body = @{
+      mac    = $MACAddress
+      active = $Active
+    }
+    if ($Comment)
+    {
+      $Body.add('comment', $Comment)
+    }
+    if ($Inventory)
+    {
+      $Body.add('inventory', $Inventory)
     }
     if ($IPAddress)
     {
       $Body.add('staticIps', $IPAddress)
     }
+    if ($AuthorizedVlans)
+    {
+      $Body.add('authorizedVlans', @($AuthorizedVlans))
+    }
     if ($EndpointGroupId)
     {
       $Body.add('endpointGroupId', $EndpointGroupId)
     }
-    $Body = $Body | ConvertTo-Json
-
-    $BaseURL = ('https://{0}:{1}/api/v{2}/endpoints' -f $HostName, $TCPPort, $ApiVersion)
-    $SessionURL = ('{0}' -f $BaseURL)
+    $params.Add('Body', (ConvertTo-Json $Body))
+    $params.Add('Uri', ('{0}' -f $BaseURL))
     if ($PSCmdlet.ShouldProcess('EndpointGroup: {0}' -f $Name))
     {
-      Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Body $Body -Method 'Post'
+      Invoke-MacmonRestMethod @Params
     }
   }
   end

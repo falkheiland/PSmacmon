@@ -154,34 +154,49 @@ function New-MacmonEndpointGroup
 
   begin
   {
+    Invoke-MacmonTrustSelfSignedCertificate
+    $UriArray = @($HostName, $TCPPort, $ApiVersion)
+    $BaseURL = ('https://{0}:{1}/api/v{2}/endpointgroups' -f $UriArray)
+    $Params = @{
+      Credential = $Credential
+      Method     = 'Post'
+    }
   }
   process
   {
-    Invoke-MacmonTrustSelfSignedCertificate
-
     $Body = @{
-      name                  = $Name
-      description           = $Description
-      macStatisticActive    = $MacStatisticActive
-      macValidity           = $MacValidity * 86400000
-      authorizedVlansLow    = $AuthorizedVlansLow
-      permissionLow         = $PermissionLow
-      authorizedVlansMedium = $AuthorizedVlansMedium
-      permissionMedium      = $PermissionMedium
-      authorizedVlansHigh   = $AuthorizedVlansHigh
-      permissionHigh        = $PermissionHigh
+      name               = $Name
+      macStatisticActive = $MacStatisticActive
+      macValidity        = $MacValidity * 86400000
+      permissionLow      = $PermissionLow
+      permissionMedium   = $PermissionMedium
+      permissionHigh     = $PermissionHigh
+    }
+    if ($Description)
+    {
+      $Body.add('description', $Description)
+    }
+    if ($AuthorizedVlansLow)
+    {
+      $Body.add('authorizedVlansLow', $AuthorizedVlansLow)
+    }
+    if ($AuthorizedVlansMedium)
+    {
+      $Body.add('authorizedVlansMedium', $AuthorizedVlansMedium)
+    }
+    if ($AuthorizedVlansHigh)
+    {
+      $Body.add('authorizedVlansHigh', $AuthorizedVlansHigh)
     }
     if ($ObsoleteEndpointExpire -ge 0)
     {
       $Body.add('obsoleteEndpointExpire', $ObsoleteEndpointExpire * 86400000)
     }
-    $Body = $Body | ConvertTo-Json
-
-    $BaseURL = ('https://{0}:{1}/api/v{2}/endpointgroups' -f $HostName, $TCPPort, $ApiVersion)
-    $SessionURL = ('{0}' -f $BaseURL)
+    $params.Add('Body', (ConvertTo-Json $Body))
+    $params.Add('Uri', ('{0}' -f $BaseURL))
     if ($PSCmdlet.ShouldProcess('EndpointGroup: {0}' -f $Name))
     {
-      Invoke-MacmonRestMethod -Credential $Credential -SessionURL $SessionURL -Body $Body -Method 'Post'
+      Invoke-MacmonRestMethod @Params
     }
   }
   end
