@@ -12,6 +12,16 @@ If you did not provide a credential, one will be created.
 
 My goal is to support all API-functionalities. Suggestions are welcome.
 
+## Installation
+
+If you have the [PowerShellGet](https://github.com/powershell/powershellget) module installed you can enter the following command:
+
+```powershell
+Install-Module -Name PSmacmon
+```
+
+Alternatively you can download a ZIP file of the latest version from our [Releases](https://github.com/falkheiland/PSmacmon/releases) page.
+
 ## Functions
 
 ### [Get-MacmonCredential](/Docs/Get-MacmonCredential.md)
