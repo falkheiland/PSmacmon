@@ -118,7 +118,7 @@
       Tags       = @('macmon', 'NAC')
 
       # Eine URL zur Lizenz für dieses Modul.
-      LicenseUri = 'https://github.com/falkheiland/PSmacmon/blob/master/LICENSE'
+      LicenseUri = 'https://github.com/falkheiland/PSmacmon/blob/master/LICENSE.md'
 
       # Eine URL zur Hauptwebsite für dieses Projekt.
       ProjectUri = 'https://github.com/falkheiland/PSmacmon'
